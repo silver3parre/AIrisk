@@ -8,9 +8,19 @@ class Assessment(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     # Could add user info here if we had auth
 
+class Asset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    asset_type = db.Column(db.String(100))  # Hardware, Software, Data, etc.
+    valuation = db.Column(db.Float, nullable=True)  # Optional asset value
+    
+    assessment = db.relationship('Assessment', backref=db.backref('assets', lazy=True))
+
 class RiskEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)
+    asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=True)
     
     threat_source = db.Column(db.String(200))
     threat_event = db.Column(db.String(200))
@@ -27,6 +37,8 @@ class RiskEntry(db.Model):
     overall_likelihood = db.Column(db.Integer) # 1-5
     
     impact_level = db.Column(db.Integer) # 1-5
+    financial_impact = db.Column(db.Float, nullable=True)  # CRQ: Estimated loss in $
     risk_level = db.Column(db.Integer) # 1-5
     
     assessment = db.relationship('Assessment', backref=db.backref('entries', lazy=True))
+    asset = db.relationship('Asset', backref=db.backref('risk_entries', lazy=True))
