@@ -64,11 +64,24 @@ def calculate_risk_details(data):
         l_impact = int(data.get('likelihood_impact', 1))
         impact = int(data.get('impact_level', 1))
         
+        # Zero Trust Alignment: Boost likelihood for Insider threats
+        threat_source = data.get('threat_source', '').lower()
+        if 'insider' in threat_source or 'privileged' in threat_source or 'trusted insider' in threat_source:
+            # Apply Zero Trust principle: Assume Breach
+            # Boost likelihood_initiation to minimum of 3 (Moderate)
+            if l_init < 3:
+                l_init = 3
+        
         overall_likelihood = calculate_overall_likelihood(l_init, l_impact)
         risk_score = calculate_risk(overall_likelihood, impact)
         
+        # SCRM Tagging
+        threat_source_display = data.get('threat_source')
+        if 'vendor' in threat_source.lower() or 'supplier' in threat_source.lower():
+            threat_source_display = f"{threat_source_display} [SCRM]"
+        
         return {
-            'threat_source': data.get('threat_source'),
+            'threat_source': threat_source_display,
             'threat_event': data.get('threat_event'),
             'capability': data.get('capability'),
             'intent': data.get('intent'),
@@ -94,3 +107,4 @@ def calculate_risk_details(data):
             'risk_level': 'Error',
             'risk_score': 0
         }
+

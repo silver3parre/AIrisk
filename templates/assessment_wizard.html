@@ -1,41 +1,59 @@
-<div class="form-group">
-    <label for="asset_type">Asset Type</label>
-    <select id="asset_type" name="asset_type" required>
-        <option value="">Select Type</option>
-        <option value="Data">Data</option>
-        <option value="Software">Software</option>
-        <option value="Hardware">Hardware</option>
-        <option value="Service">Service</option>
-    </select>
-</div>
+{% extends 'base.html' %}
 
-<div class="form-group">
-    <label for="asset_valuation">Asset Valuation (Optional)</label>
-    <input type="number" id="asset_valuation" name="asset_valuation" step="0.01" placeholder="Estimated value in $">
-</div>
-</div>
-
-{% elif step == 2 %}
-<div class="step-content">
-    <h2>Step 2: Identify Adversarial Threat Source</h2>
-    <p class="step-desc">Who is the adversary? (e.g., Hacktivist, Insider, Competitor, Nation State)</p>
-
-    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-1')">Expand Options /
-        Guidance</button>
-    <div id="guidance-1" class="guidance-content hidden">
-        <h4>Common Adversarial Threat Sources</h4>
-        <ul>
-            <li><strong>Individual:</strong> Outsider, Insider, Trusted Insider, Privileged Insider.</li>
-            <li><strong>Group:</strong> Ad hoc, Established, Cyber Crime, Terrorist.</li>
-            <li><strong>Organization:</strong> Competitor, Supplier, Partner, Customer.</li>
-            <li><strong>Nation-State:</strong> Intelligence Service, Military, Proxy.</li>
-        </ul>
+{% block content %}
+<div class="wizard-container">
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ (step / 11) * 100 }}%;"></div>
     </div>
 
-    <div class="form-group">
-        <label for="threat_source">Threat Source Name</label>
-        <input type="text" id="threat_source" name="threat_source" required placeholder="e.g. External Attacker">
-    </div>
+    <form method="POST" class="wizard-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        {% if step == 1 %}
+        <div class="step-content">
+            <h2>Step 1: Identify Asset</h2>
+            <p class="step-desc">What asset are you assessing? (e.g., Customer Database, Web Server, Employee Data)</p>
+
+            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-asset')">Expand Options /
+                Guidance</button>
+            <div id="guidance-asset" class="guidance-content hidden">
+                <h4>Asset Types</h4>
+                <ul>
+                    <li><strong>Data:</strong> Customer records, intellectual property, financial data.</li>
+                    <li><strong>Software:</strong> Applications, operating systems, firmware.</li>
+                    <li><strong>Hardware:</strong> Servers, workstations, network devices.</li>
+                    <li><strong>Services:</strong> Cloud services, APIs, critical business processes.</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <label for="asset_name">Asset Name</label>
+                <input type="text" id="asset_name" name="asset_name" required placeholder="e.g. Customer Database">
+            </div>
+
+            <div class="form-group">
+                <label for="asset_type">Asset Type</label>
+                <select id="asset_type" name="asset_type" required>
+                    <option value="">Select Type</option>
+                    <option value="Data">Data</option>
+                    <option value="Software">Software</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Service">Service</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="asset_valuation">Asset Valuation (Optional)</label>
+                <input type="number" id="asset_valuation" name="asset_valuation" step="0.01"
+                    placeholder="Estimated value in $">
+            </div>
+        </div>
+
+        {% elif step == 2 %}
+        <div class="step-content">
+            <h2>Step 2: Identify Adversarial Threat Source</h2>
+            placeholder="e.g. External Attacker">
+        </div>
 </div>
 
 {% elif step == 3 %}
@@ -288,19 +306,11 @@
         </ul>
     </div>
 
-</div>
-
-<div class="form-group" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-    <label for="vulnerability_report"><strong>Auto-fill from Scanner Report</strong> (Optional)</label>
-    <input type="file" id="vulnerability_report" name="vulnerability_report" accept=".json,.xml">
-    <small class="form-text text-muted">Upload a JSON or XML report to auto-populate fields.</small>
-</div>
-
-<div class="form-group">
-    <label for="vulnerability">Vulnerability Description</label>
-    <input type="text" id="vulnerability" name="vulnerability" required
-        placeholder="e.g. Unpatched Software or Select Category">
-</div>
+    <div class="form-group">
+        <label for="vulnerability">Vulnerability Description</label>
+        <input type="text" id="vulnerability" name="vulnerability" required
+            placeholder="e.g. Unpatched Software or Select Category">
+    </div>
 </div>
 
 {% elif step == 9 %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Assessment Dashboard</h2>
+        <p class="lead">Manage and review your risk assessments.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-list-check"></i> Past Assessments
+            </div>
+            <div class="card-body">
+                {% if assessments %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Asset Name</th>
+                            <th>Asset Type</th>
+                            <th>Risk Level</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assessment in assessments %}
+                        <tr>
+                            <td>{{ assessment.id }}</td>
+                            <td>{{ assessment.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if assessment.assets %}
+                                {{ assessment.assets[0].name }}
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if assessment.assets %}
+                                {{ assessment.assets[0].asset_type }}
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if assessment.entries %}
+                                {% set risk_level = assessment.entries[0].risk_level %}
+                                {% if risk_level >= 4 %}
+                                <span class="badge bg-danger">High ({{ risk_level }})</span>
+                                {% elif risk_level == 3 %}
+                                <span class="badge bg-warning text-dark">Moderate ({{ risk_level }})</span>
+                                {% else %}
+                                <span class="badge bg-success">Low ({{ risk_level }})</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">{{ assessment.status }}</span>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-secondary disabled">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="alert alert-info">
+                    No assessments found. <a href="{{ url_for('start_assessment') }}">Start a new assessment</a>.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
