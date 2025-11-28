@@ -111,10 +111,15 @@ graph TB
 - **Migration Support**: Flask-Migrate integration for schema management
 
 ### 2. Data Models (`models.py`)
-- **Assessment Model**: Stores assessment metadata and timestamps
-- **RiskEntry Model**: Stores individual risk assessment entries
-- **Relationships**: Defines associations between assessments and entries
-- **Schema Management**: Handled by SQLAlchemy ORM
+- **Assessment Model**: Stores assessment metadata, timestamps, and status
+- **Asset Model**: Stores asset information (name, type, valuation) linked to assessments
+- **RiskEntry Model**: Stores comprehensive risk data including:
+  - Threat characteristics (source, event, adversary factors)
+  - Likelihood assessments (initiation, impact, overall)
+  - Impact measurements (financial, BIA dimensions)
+  - Calculated risk levels
+- **Relationships**: One-to-many associations between Assessment ↔ Asset ↔ RiskEntry
+- **Schema Management**: Handled by SQLAlchemy ORM and Flask-Migrate
 
 ### 3. Risk Calculation Engine (`risk_logic.py`)
 - **NIST 800-30 Implementation**: Semi-quantitative risk matrices
@@ -126,8 +131,14 @@ graph TB
 - **base.html**: Master template with navigation and layout
 - **index.html**: Landing page
 - **about.html**: Information about the application
-- **assessment_wizard.html**: 10-step assessment wizard interface
-- **result.html**: Risk assessment results display
+- **assessment_wizard.html**: 11-step assessment wizard interface with:
+  - Asset identification (Step 1)
+  - Threat analysis (Steps 2-6)
+  - Vulnerability and likelihood assessment (Steps 7-9)
+  - Impact and BIA evaluation (Step 10)
+  - Review (Step 11)
+- **result.html**: Comprehensive risk results with asset profile, threat analysis, and BIA
+- **dashboard.html**: Assessment history and management interface
 
 ### 5. Static Assets (`static/`)
 - **style.css**: Application styling and responsive design (9.8 KB)
@@ -187,10 +198,13 @@ sequenceDiagram
 
 ### Risk Calculation Process
 
-1. **Input Collection**: Gather threat, vulnerability, and impact data (10 steps)
+1. **Input Collection**: Gather asset, threat, vulnerability, and impact data (11 steps)
 2. **Likelihood Calculation**: Combine initiation and impact likelihoods
 3. **Risk Matrix Lookup**: Map likelihood × impact to risk level
-4. **Result Presentation**: Display risk score with recommendations
+4. **Business Impact Analysis**: Evaluate reputation, legal, operational, and safety impacts
+5. **Cyber Risk Quantification**: Estimate financial losses
+6. **Result Presentation**: Display comprehensive risk profile with all dimensions
+7. **Persistence**: Optionally save assessment for future reference
 
 ## Security Features
 

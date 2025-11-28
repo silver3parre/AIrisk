@@ -1,476 +1,449 @@
-{% extends 'base.html' %}
+<div class="form-group">
+    <label for="asset_type">Asset Type</label>
+    <select id="asset_type" name="asset_type" required>
+        <option value="">Select Type</option>
+        <option value="Data">Data</option>
+        <option value="Software">Software</option>
+        <option value="Hardware">Hardware</option>
+        <option value="Service">Service</option>
+    </select>
+</div>
 
-{% block content %}
-<div class="wizard-container">
-    <div class="progress-bar">
-        <div class="progress-fill" style="width: {{ (step / 11) * 100 }}%;"></div>
+<div class="form-group">
+    <label for="asset_valuation">Asset Valuation (Optional)</label>
+    <input type="number" id="asset_valuation" name="asset_valuation" step="0.01" placeholder="Estimated value in $">
+</div>
+</div>
+
+{% elif step == 2 %}
+<div class="step-content">
+    <h2>Step 2: Identify Adversarial Threat Source</h2>
+    <p class="step-desc">Who is the adversary? (e.g., Hacktivist, Insider, Competitor, Nation State)</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-1')">Expand Options /
+        Guidance</button>
+    <div id="guidance-1" class="guidance-content hidden">
+        <h4>Common Adversarial Threat Sources</h4>
+        <ul>
+            <li><strong>Individual:</strong> Outsider, Insider, Trusted Insider, Privileged Insider.</li>
+            <li><strong>Group:</strong> Ad hoc, Established, Cyber Crime, Terrorist.</li>
+            <li><strong>Organization:</strong> Competitor, Supplier, Partner, Customer.</li>
+            <li><strong>Nation-State:</strong> Intelligence Service, Military, Proxy.</li>
+        </ul>
     </div>
 
-    <form method="POST" class="wizard-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="form-group">
+        <label for="threat_source">Threat Source Name</label>
+        <input type="text" id="threat_source" name="threat_source" required placeholder="e.g. External Attacker">
+    </div>
+</div>
 
-        {% if step == 1 %}
-        <div class="step-content">
-            <h2>Step 1: Identify Asset</h2>
-            <p class="step-desc">What asset are you assessing? (e.g., Customer Database, Web Server, Employee Data)</p>
+{% elif step == 3 %}
+<div class="step-content">
+    <h2>Step 3: Identify Threat Event</h2>
+    <p class="step-desc">What is the event? (e.g., Phishing attack, SQL Injection, Malware)</p>
 
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-asset')">Expand Options /
-                Guidance</button>
-            <div id="guidance-asset" class="guidance-content hidden">
-                <h4>Asset Types</h4>
-                <ul>
-                    <li><strong>Data:</strong> Customer records, intellectual property, financial data.</li>
-                    <li><strong>Software:</strong> Applications, operating systems, firmware.</li>
-                    <li><strong>Hardware:</strong> Servers, workstations, network devices.</li>
-                    <li><strong>Services:</strong> Cloud services, APIs, critical business processes.</li>
-                </ul>
-            </div>
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-2')">Expand Options /
+        Guidance</button>
+    <div id="guidance-2" class="guidance-content hidden">
+        <h4>Common Threat Events</h4>
+        <ul>
+            <li><strong>Reconnaissance:</strong> Scanning, Social Engineering.</li>
+            <li><strong>Access:</strong> Brute Force, Exploit Vulnerability, Phishing.</li>
+            <li><strong>Misuse:</strong> Privilege Escalation, Data Exfiltration.</li>
+            <li><strong>Modification:</strong> Defacement, Integrity Violation.</li>
+            <li><strong>Denial of Service:</strong> Flooding, Resource Exhaustion.</li>
+        </ul>
+    </div>
 
-            <div class="form-group">
-                <label for="asset_name">Asset Name</label>
-                <input type="text" id="asset_name" name="asset_name" required placeholder="e.g. Customer Database">
-            </div>
+    <div class="form-group">
+        <label for="threat_event">Threat Event Description</label>
+        <input type="text" id="threat_event" name="threat_event" required placeholder="e.g. Phishing Campaign">
+    </div>
 
-            <div class="form-group">
-                <label for="asset_type">Asset Type</label>
-                <select id="asset_type" name="asset_type" required>
-                    <option value="">Select Type</option>
-                    <option value="Data">Data</option>
-                    <option value="Software">Software</option>
-                    <option value="Hardware">Hardware</option>
-                    <option value="Service">Service</option>
-                </select>
-            </div>
+    {% if suggested_threats %}
+    <div class="form-group" style="margin-top: 15px;">
+        <label for="suggested_threats">Suggested Threats (Based on Asset Type)</label>
+        <select id="suggested_threats" onchange="document.getElementById('threat_event').value = this.value">
+            <option value="">-- Select a Suggested Threat --</option>
+            {% for threat in suggested_threats %}
+            <option value="{{ threat.name }} ({{ threat.id }})">{{ threat.name }} ({{ threat.id }}) - {{
+                threat.description }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+</div>
 
-            <div class="form-group">
-                <label for="asset_valuation">Asset Valuation (Optional)</label>
-                <input type="number" id="asset_valuation" name="asset_valuation" step="0.01"
-                    placeholder="Estimated value in $">
-            </div>
+{% elif step == 4 %}
+<div class="step-content">
+    <h2>Step 4: Adversary Capability</h2>
+    <p class="step-desc">What is the level of resources and expertise available to the adversary?</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-3')">Expand Options /
+        Guidance</button>
+    <div id="guidance-3" class="guidance-content hidden">
+        <h4>Capability Levels</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Little/no technical expertise; uses standard tools.</li>
+            <li><strong>Low:</strong> Some expertise; uses available tools.</li>
+            <li><strong>Moderate:</strong> Competent; can customize tools.</li>
+            <li><strong>High:</strong> Highly skilled; creates custom tools.</li>
+            <li><strong>Very High:</strong> State-sponsored; advanced persistent threat.</li>
+        </ul>
+    </div>
+
+    <div class="radio-group">
+        <label class="radio-card">
+            <input type="radio" name="capability" value="Very Low" required>
+            <span class="card-content"><span class="level">Very Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="capability" value="Low">
+            <span class="card-content"><span class="level">Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="capability" value="Moderate">
+            <span class="card-content"><span class="level">Moderate</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="capability" value="High">
+            <span class="card-content"><span class="level">High</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="capability" value="Very High">
+            <span class="card-content"><span class="level">Very High</span></span>
+        </label>
+    </div>
+</div>
+
+{% elif step == 5 %}
+<div class="step-content">
+    <h2>Step 5: Adversary Intent</h2>
+    <p class="step-desc">What is the motivation and willingness of the adversary?</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-4')">Expand Options /
+        Guidance</button>
+    <div id="guidance-4" class="guidance-content hidden">
+        <h4>Intent Levels</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Unlikely to target; accidental.</li>
+            <li><strong>Low:</strong> Limited motivation; opportunistic.</li>
+            <li><strong>Moderate:</strong> Motivated; will target if goals met.</li>
+            <li><strong>High:</strong> Highly motivated; persistent targeting.</li>
+            <li><strong>Very High:</strong> Extremely motivated; stops at nothing.</li>
+        </ul>
+    </div>
+
+    <div class="radio-group">
+        <label class="radio-card">
+            <input type="radio" name="intent" value="Very Low" required>
+            <span class="card-content"><span class="level">Very Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="intent" value="Low">
+            <span class="card-content"><span class="level">Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="intent" value="Moderate">
+            <span class="card-content"><span class="level">Moderate</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="intent" value="High">
+            <span class="card-content"><span class="level">High</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="intent" value="Very High">
+            <span class="card-content"><span class="level">Very High</span></span>
+        </label>
+    </div>
+</div>
+
+{% elif step == 6 %}
+<div class="step-content">
+    <h2>Step 6: Adversary Targeting</h2>
+    <p class="step-desc">How focused is the adversary on specific assets or the organization?</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-5')">Expand Options /
+        Guidance</button>
+    <div id="guidance-5" class="guidance-content hidden">
+        <h4>Targeting Levels</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Broad, indiscriminate (e.g., spam).</li>
+            <li><strong>Low:</strong> Sector/Industry wide, not specific org.</li>
+            <li><strong>Moderate:</strong> Specific organizations or assets.</li>
+            <li><strong>High:</strong> Focused on critical assets/individuals.</li>
+            <li><strong>Very High:</strong> Persistent, multi-vector targeting.</li>
+        </ul>
+    </div>
+
+    <div class="radio-group">
+        <label class="radio-card">
+            <input type="radio" name="targeting" value="Very Low" required>
+            <span class="card-content"><span class="level">Very Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="targeting" value="Low">
+            <span class="card-content"><span class="level">Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="targeting" value="Moderate">
+            <span class="card-content"><span class="level">Moderate</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="targeting" value="High">
+            <span class="card-content"><span class="level">High</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="targeting" value="Very High">
+            <span class="card-content"><span class="level">Very High</span></span>
+        </label>
+    </div>
+</div>
+
+{% elif step == 7 %}
+<div class="step-content">
+    <h2>Step 7: Likelihood of Initiation</h2>
+    <p class="step-desc">Based on Capability, Intent, and Targeting, how likely is the threat to be
+        initiated?
+    </p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-6')">Expand Options /
+        Guidance</button>
+    <div id="guidance-6" class="guidance-content hidden">
+        <h4>Likelihood of Initiation</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Adversary is unlikely to initiate.</li>
+            <li><strong>Low:</strong> Adversary may initiate.</li>
+            <li><strong>Moderate:</strong> Adversary is likely to initiate.</li>
+            <li><strong>High:</strong> Adversary is highly likely to initiate.</li>
+            <li><strong>Very High:</strong> Adversary is almost certain to initiate.</li>
+        </ul>
+    </div>
+
+    <div class="radio-group">
+        <label class="radio-card">
+            <input type="radio" name="likelihood_initiation" value="1" required>
+            <span class="card-content"><span class="level">Very Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_initiation" value="2">
+            <span class="card-content"><span class="level">Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_initiation" value="3">
+            <span class="card-content"><span class="level">Moderate</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_initiation" value="4">
+            <span class="card-content"><span class="level">High</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_initiation" value="5">
+            <span class="card-content"><span class="level">Very High</span></span>
+        </label>
+    </div>
+</div>
+
+{% elif step == 8 %}
+<div class="step-content">
+    <h2>Step 8: Identify Vulnerability (Appendix F)</h2>
+    <p class="step-desc">What weakness is being exploited? Select a category or describe.</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-7')">Expand Options /
+        Guidance</button>
+    <div id="guidance-7" class="guidance-content hidden">
+        <h4>Vulnerability Categories (Appendix F)</h4>
+        <p>Select a category to auto-fill or type your own.</p>
+        <div class="chip-group">
+            <button type="button" class="chip" onclick="fillVulnerability('Technical - Hardware')">Technical
+                -
+                Hardware</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Technical - Software')">Technical
+                -
+                Software</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Technical - Network')">Technical
+                -
+                Network</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Operational - People')">Operational -
+                People</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Operational - Process')">Operational
+                - Process</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Management - Policy')">Management
+                -
+                Policy</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Physical - Facility')">Physical -
+                Facility</button>
+            <button type="button" class="chip" onclick="fillVulnerability('Supply Chain')">Supply
+                Chain</button>
         </div>
+        <br>
+        <h4>Vulnerability Severity</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Minor weakness, hard to exploit.</li>
+            <li><strong>Low:</strong> Moderate weakness, requires high skill.</li>
+            <li><strong>Moderate:</strong> Significant weakness, requires moderate skill.</li>
+            <li><strong>High:</strong> Major weakness, easy to exploit.</li>
+            <li><strong>Very High:</strong> Critical weakness, trivial to exploit.</li>
+        </ul>
+    </div>
 
-        {% elif step == 2 %}
-        <div class="step-content">
-            <h2>Step 2: Identify Adversarial Threat Source</h2>
-            <p class="step-desc">Who is the adversary? (e.g., Hacktivist, Insider, Competitor, Nation State)</p>
+</div>
 
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-1')">Expand Options /
-                Guidance</button>
-            <div id="guidance-1" class="guidance-content hidden">
-                <h4>Common Adversarial Threat Sources</h4>
-                <ul>
-                    <li><strong>Individual:</strong> Outsider, Insider, Trusted Insider, Privileged Insider.</li>
-                    <li><strong>Group:</strong> Ad hoc, Established, Cyber Crime, Terrorist.</li>
-                    <li><strong>Organization:</strong> Competitor, Supplier, Partner, Customer.</li>
-                    <li><strong>Nation-State:</strong> Intelligence Service, Military, Proxy.</li>
-                </ul>
-            </div>
+<div class="form-group" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+    <label for="vulnerability_report"><strong>Auto-fill from Scanner Report</strong> (Optional)</label>
+    <input type="file" id="vulnerability_report" name="vulnerability_report" accept=".json,.xml">
+    <small class="form-text text-muted">Upload a JSON or XML report to auto-populate fields.</small>
+</div>
 
-            <div class="form-group">
-                <label for="threat_source">Threat Source Name</label>
-                <input type="text" id="threat_source" name="threat_source" required
-                    placeholder="e.g. External Attacker">
-            </div>
+<div class="form-group">
+    <label for="vulnerability">Vulnerability Description</label>
+    <input type="text" id="vulnerability" name="vulnerability" required
+        placeholder="e.g. Unpatched Software or Select Category">
+</div>
+</div>
+
+{% elif step == 9 %}
+<div class="step-content">
+    <h2>Step 9: Likelihood of Adverse Impact</h2>
+    <p class="step-desc">If the event occurs, how likely is it to have an adverse impact?</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-8')">Expand Options /
+        Guidance</button>
+    <div id="guidance-8" class="guidance-content hidden">
+        <h4>Likelihood of Impact</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Almost certain not to cause impact.</li>
+            <li><strong>Low:</strong> Highly unlikely to cause impact.</li>
+            <li><strong>Moderate:</strong> Somewhat likely to cause impact.</li>
+            <li><strong>High:</strong> Highly likely to cause impact.</li>
+            <li><strong>Very High:</strong> Almost certain to cause impact.</li>
+        </ul>
+    </div>
+
+    <div class="radio-group">
+        <label class="radio-card">
+            <input type="radio" name="likelihood_impact" value="1" required>
+            <span class="card-content"><span class="level">Very Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_impact" value="2">
+            <span class="card-content"><span class="level">Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_impact" value="3">
+            <span class="card-content"><span class="level">Moderate</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_impact" value="4">
+            <span class="card-content"><span class="level">High</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="likelihood_impact" value="5">
+            <span class="card-content"><span class="level">Very High</span></span>
+        </label>
+    </div>
+</div>
+
+{% elif step == 10 %}
+<div class="step-content">
+    <h2>Step 10: Impact Level</h2>
+    <p class="step-desc">What would be the magnitude of harm if the event occurs?</p>
+
+    <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-9')">Expand Options /
+        Guidance</button>
+    <div id="guidance-9" class="guidance-content hidden">
+        <h4>Impact Levels</h4>
+        <ul>
+            <li><strong>Very Low:</strong> Negligible adverse effect.</li>
+            <li><strong>Low:</strong> Limited adverse effect.</li>
+            <li><strong>Moderate:</strong> Serious adverse effect.</li>
+            <li><strong>High:</strong> Severe or catastrophic adverse effect.</li>
+            <li><strong>Very High:</strong> Multiple severe or catastrophic effects.</li>
+        </ul>
+    </div>
+
+    <div class="radio-group">
+        <label class="radio-card">
+            <input type="radio" name="impact_level" value="1" required>
+            <span class="card-content"><span class="level">Very Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="impact_level" value="2">
+            <span class="card-content"><span class="level">Low</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="impact_level" value="3">
+            <span class="card-content"><span class="level">Moderate</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="impact_level" value="4">
+            <span class="card-content"><span class="level">High</span></span>
+        </label>
+        <label class="radio-card">
+            <input type="radio" name="impact_level" value="5">
+            <span class="card-content"><span class="level">Very High</span></span>
+        </label>
+    </div>
+
+    <!-- Business Impact Analysis (BIA) Fields -->
+    <div class="bia-section" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <h3>Business Impact Analysis (BIA)</h3>
+        <p class="step-desc">Rate the potential impact on specific business areas.</p>
+
+        <div class="form-group">
+            <label>Reputation Damage</label>
+            <select name="bia_reputation">
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+            </select>
         </div>
-
-        {% elif step == 3 %}
-        <div class="step-content">
-            <h2>Step 3: Identify Threat Event</h2>
-            <p class="step-desc">What is the event? (e.g., Phishing attack, SQL Injection, Malware)</p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-2')">Expand Options /
-                Guidance</button>
-            <div id="guidance-2" class="guidance-content hidden">
-                <h4>Common Threat Events</h4>
-                <ul>
-                    <li><strong>Reconnaissance:</strong> Scanning, Social Engineering.</li>
-                    <li><strong>Access:</strong> Brute Force, Exploit Vulnerability, Phishing.</li>
-                    <li><strong>Misuse:</strong> Privilege Escalation, Data Exfiltration.</li>
-                    <li><strong>Modification:</strong> Defacement, Integrity Violation.</li>
-                    <li><strong>Denial of Service:</strong> Flooding, Resource Exhaustion.</li>
-                </ul>
-            </div>
-
-            <div class="form-group">
-                <label for="threat_event">Threat Event Description</label>
-                <input type="text" id="threat_event" name="threat_event" required placeholder="e.g. Phishing Campaign">
-            </div>
-
-            {% if suggested_threats %}
-            <div class="form-group" style="margin-top: 15px;">
-                <label for="suggested_threats">Suggested Threats (Based on Asset Type)</label>
-                <select id="suggested_threats" onchange="document.getElementById('threat_event').value = this.value">
-                    <option value="">-- Select a Suggested Threat --</option>
-                    {% for threat in suggested_threats %}
-                    <option value="{{ threat.name }} ({{ threat.id }})">{{ threat.name }} ({{ threat.id }}) - {{
-                        threat.description }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            {% endif %}
+        <div class="form-group">
+            <label>Legal/Regulatory Fines</label>
+            <select name="bia_legal">
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+            </select>
         </div>
-
-        {% elif step == 4 %}
-        <div class="step-content">
-            <h2>Step 4: Adversary Capability</h2>
-            <p class="step-desc">What is the level of resources and expertise available to the adversary?</p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-3')">Expand Options /
-                Guidance</button>
-            <div id="guidance-3" class="guidance-content hidden">
-                <h4>Capability Levels</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Little/no technical expertise; uses standard tools.</li>
-                    <li><strong>Low:</strong> Some expertise; uses available tools.</li>
-                    <li><strong>Moderate:</strong> Competent; can customize tools.</li>
-                    <li><strong>High:</strong> Highly skilled; creates custom tools.</li>
-                    <li><strong>Very High:</strong> State-sponsored; advanced persistent threat.</li>
-                </ul>
-            </div>
-
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="capability" value="Very Low" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="capability" value="Low">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="capability" value="Moderate">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="capability" value="High">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="capability" value="Very High">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
+        <div class="form-group">
+            <label>Operational Disruption</label>
+            <select name="bia_operational">
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+            </select>
         </div>
-
-        {% elif step == 5 %}
-        <div class="step-content">
-            <h2>Step 5: Adversary Intent</h2>
-            <p class="step-desc">What is the motivation and willingness of the adversary?</p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-4')">Expand Options /
-                Guidance</button>
-            <div id="guidance-4" class="guidance-content hidden">
-                <h4>Intent Levels</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Unlikely to target; accidental.</li>
-                    <li><strong>Low:</strong> Limited motivation; opportunistic.</li>
-                    <li><strong>Moderate:</strong> Motivated; will target if goals met.</li>
-                    <li><strong>High:</strong> Highly motivated; persistent targeting.</li>
-                    <li><strong>Very High:</strong> Extremely motivated; stops at nothing.</li>
-                </ul>
-            </div>
-
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="intent" value="Very Low" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="intent" value="Low">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="intent" value="Moderate">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="intent" value="High">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="intent" value="Very High">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
+        <div class="form-group">
+            <label>Safety/Health Impact</label>
+            <select name="bia_safety">
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+            </select>
         </div>
+    </div>
 
-        {% elif step == 6 %}
-        <div class="step-content">
-            <h2>Step 6: Adversary Targeting</h2>
-            <p class="step-desc">How focused is the adversary on specific assets or the organization?</p>
+    <!-- CRQ: Financial Impact Field -->
+    <div class="form-group" style="margin-top: 20px;">
+        <label for="financial_impact">Estimated Financial Impact ($)</label>
+        <input type="number" id="financial_impact" name="financial_impact" step="0.01" placeholder="e.g. 50000">
+        <small>Optional: Estimate the potential financial loss.</small>
+    </div>
+</div>
 
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-5')">Expand Options /
-                Guidance</button>
-            <div id="guidance-5" class="guidance-content hidden">
-                <h4>Targeting Levels</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Broad, indiscriminate (e.g., spam).</li>
-                    <li><strong>Low:</strong> Sector/Industry wide, not specific org.</li>
-                    <li><strong>Moderate:</strong> Specific organizations or assets.</li>
-                    <li><strong>High:</strong> Focused on critical assets/individuals.</li>
-                    <li><strong>Very High:</strong> Persistent, multi-vector targeting.</li>
-                </ul>
-            </div>
+{% elif step == 11 %}
+<div class="step-content">
+    <h2>Step 11: Review</h2>
+    <p class="step-desc">Ready to calculate risk?</p>
+    <p>Click "Next Step" to see the results.</p>
+</div>
+{% endif %}
 
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="Very Low" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="Low">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="Moderate">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="High">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="Very High">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
-
-        {% elif step == 7 %}
-        <div class="step-content">
-            <h2>Step 7: Likelihood of Initiation</h2>
-            <p class="step-desc">Based on Capability, Intent, and Targeting, how likely is the threat to be
-                initiated?
-            </p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-6')">Expand Options /
-                Guidance</button>
-            <div id="guidance-6" class="guidance-content hidden">
-                <h4>Likelihood of Initiation</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Adversary is unlikely to initiate.</li>
-                    <li><strong>Low:</strong> Adversary may initiate.</li>
-                    <li><strong>Moderate:</strong> Adversary is likely to initiate.</li>
-                    <li><strong>High:</strong> Adversary is highly likely to initiate.</li>
-                    <li><strong>Very High:</strong> Adversary is almost certain to initiate.</li>
-                </ul>
-            </div>
-
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="1" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="2">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="3">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="4">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="5">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
-
-        {% elif step == 8 %}
-        <div class="step-content">
-            <h2>Step 8: Identify Vulnerability (Appendix F)</h2>
-            <p class="step-desc">What weakness is being exploited? Select a category or describe.</p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-7')">Expand Options /
-                Guidance</button>
-            <div id="guidance-7" class="guidance-content hidden">
-                <h4>Vulnerability Categories (Appendix F)</h4>
-                <p>Select a category to auto-fill or type your own.</p>
-                <div class="chip-group">
-                    <button type="button" class="chip" onclick="fillVulnerability('Technical - Hardware')">Technical
-                        -
-                        Hardware</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Technical - Software')">Technical
-                        -
-                        Software</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Technical - Network')">Technical
-                        -
-                        Network</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Operational - People')">Operational -
-                        People</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Operational - Process')">Operational
-                        - Process</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Management - Policy')">Management
-                        -
-                        Policy</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Physical - Facility')">Physical -
-                        Facility</button>
-                    <button type="button" class="chip" onclick="fillVulnerability('Supply Chain')">Supply
-                        Chain</button>
-                </div>
-                <br>
-                <h4>Vulnerability Severity</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Minor weakness, hard to exploit.</li>
-                    <li><strong>Low:</strong> Moderate weakness, requires high skill.</li>
-                    <li><strong>Moderate:</strong> Significant weakness, requires moderate skill.</li>
-                    <li><strong>High:</strong> Major weakness, easy to exploit.</li>
-                    <li><strong>Very High:</strong> Critical weakness, trivial to exploit.</li>
-                </ul>
-            </div>
-
-            <div class="form-group">
-                <label for="vulnerability">Vulnerability Description</label>
-                <input type="text" id="vulnerability" name="vulnerability" required
-                    placeholder="e.g. Unpatched Software or Select Category">
-            </div>
-        </div>
-
-        {% elif step == 9 %}
-        <div class="step-content">
-            <h2>Step 9: Likelihood of Adverse Impact</h2>
-            <p class="step-desc">If the event occurs, how likely is it to have an adverse impact?</p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-8')">Expand Options /
-                Guidance</button>
-            <div id="guidance-8" class="guidance-content hidden">
-                <h4>Likelihood of Impact</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Almost certain not to cause impact.</li>
-                    <li><strong>Low:</strong> Highly unlikely to cause impact.</li>
-                    <li><strong>Moderate:</strong> Somewhat likely to cause impact.</li>
-                    <li><strong>High:</strong> Highly likely to cause impact.</li>
-                    <li><strong>Very High:</strong> Almost certain to cause impact.</li>
-                </ul>
-            </div>
-
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="1" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="2">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="3">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="4">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="5">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
-
-        {% elif step == 10 %}
-        <div class="step-content">
-            <h2>Step 10: Impact Level</h2>
-            <p class="step-desc">What would be the magnitude of harm if the event occurs?</p>
-
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-9')">Expand Options /
-                Guidance</button>
-            <div id="guidance-9" class="guidance-content hidden">
-                <h4>Impact Levels</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Negligible adverse effect.</li>
-                    <li><strong>Low:</strong> Limited adverse effect.</li>
-                    <li><strong>Moderate:</strong> Serious adverse effect.</li>
-                    <li><strong>High:</strong> Severe or catastrophic adverse effect.</li>
-                    <li><strong>Very High:</strong> Multiple severe or catastrophic effects.</li>
-                </ul>
-            </div>
-
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="1" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="2">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="3">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="4">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="5">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-
-            <!-- Business Impact Analysis (BIA) Fields -->
-            <div class="bia-section" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-                <h3>Business Impact Analysis (BIA)</h3>
-                <p class="step-desc">Rate the potential impact on specific business areas.</p>
-
-                <div class="form-group">
-                    <label>Reputation Damage</label>
-                    <select name="bia_reputation">
-                        <option value="Low">Low</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="High">High</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Legal/Regulatory Fines</label>
-                    <select name="bia_legal">
-                        <option value="Low">Low</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="High">High</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Operational Disruption</label>
-                    <select name="bia_operational">
-                        <option value="Low">Low</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="High">High</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Safety/Health Impact</label>
-                    <select name="bia_safety">
-                        <option value="Low">Low</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="High">High</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- CRQ: Financial Impact Field -->
-            <div class="form-group" style="margin-top: 20px;">
-                <label for="financial_impact">Estimated Financial Impact ($)</label>
-                <input type="number" id="financial_impact" name="financial_impact" step="0.01" placeholder="e.g. 50000">
-                <small>Optional: Estimate the potential financial loss.</small>
-            </div>
-        </div>
-
-        {% elif step == 11 %}
-        <div class="step-content">
-            <h2>Step 11: Review</h2>
-            <p class="step-desc">Ready to calculate risk?</p>
-            <p>Click "Next Step" to see the results.</p>
-        </div>
-        {% endif %}
-
-        <div class="wizard-actions">
-            <button type="submit" class="btn-primary">Next Step</button>
-        </div>
-    </form>
+<div class="wizard-actions">
+    <button type="submit" class="btn-primary">Next Step</button>
+</div>
+</form>
 </div>
 {% endblock %}

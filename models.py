@@ -6,6 +6,7 @@ db = SQLAlchemy()
 class Assessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(50), default='Draft') # Draft, Completed
     # Could add user info here if we had auth
 
 class Asset(db.Model):
