@@ -90,7 +90,9 @@ graph TB
 |-----------|-----------|---------|
 | **Containerization** | Docker | Application packaging |
 | **Base Image** | Python 3.11 Alpine | Minimal container footprint |
-| **Build System** | Multi-stage Docker | Optimized image size |
+| **WSGI Server** | Gunicorn | Production application server |
+| **CI/CD** | GitHub Actions | Automated testing and building |
+| **Migrations** | Flask-Migrate | Database schema management |
 
 ## Component Details
 

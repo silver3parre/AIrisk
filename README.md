@@ -14,25 +14,43 @@ A web-based guided risk assessment tool based on NIST Special Publication 800-30
 - **Backend**: Python, Flask, SQLAlchemy
 - **Database**: SQLite
 - **Frontend**: HTML5, CSS3, JavaScript
+- **Production**: Gunicorn, Docker, GitHub Actions
 
 ## Setup and Installation
 
-1.  **Clone or Download** the repository.
+### Local Development
+1.  **Clone the repository**.
 2.  **Install Dependencies**:
     ```bash
-    pip install flask flask-sqlalchemy
+    pip install -r requirements.txt
     ```
-3.  **Run the Application**:
+3.  **Initialize Database**:
+    ```bash
+    flask db upgrade
+    ```
+4.  **Run the Application**:
     ```bash
     python app.py
     ```
-4.  **Access the App**:
-    Open your web browser and navigate to `http://127.0.0.1:5000`.
+
+### Production Deployment (Docker)
+1.  **Build the Image**:
+    ```bash
+    docker build -t risk-app .
+    ```
+2.  **Run the Container**:
+    ```bash
+    docker run -d -p 5000:5000 \
+      -e SECRET_KEY="your-production-secret-key" \
+      -e FLASK_ENV="production" \
+      risk-app
+    ```
+    *Note: The container automatically runs database migrations on startup.*
 
 ## Usage
 
 1.  Click **Start Assessment** from the home page.
-2.  Follow the 6-step wizard:
+2.  Follow the 10-step wizard:
     - Identify Threat Source
     - Identify Threat Event
     - Identify Vulnerability
@@ -45,5 +63,3 @@ A web-based guided risk assessment tool based on NIST Special Publication 800-30
 
 - **Risk Logic**: Modify `risk_logic.py` to adjust the risk calculation matrices.
 - **Styling**: Edit `static/style.css` to change the look and feel.
-# AIrisk
-# AIrisk
