@@ -72,10 +72,12 @@ graph TB
 |-----------|-----------|---------|---------|
 | **Runtime** | Python | 3.11 | Application runtime |
 | **Web Framework** | Flask | 3.1.2 | HTTP server and routing |
+| **WSGI Server** | Gunicorn | 21.2.0 | Production application server |
 | **ORM** | SQLAlchemy | 2.0.44 | Database abstraction |
 | **Database** | SQLite | 3.x | Data persistence |
 | **Security** | Flask-WTF | 1.2.1 | CSRF protection |
 | **Extensions** | Flask-SQLAlchemy | 3.1.1 | Flask-SQLAlchemy integration |
+| **Migrations** | Flask-Migrate | 4.0.7 | Database schema management |
 
 ### Frontend
 | Component | Technology | Purpose |
@@ -101,9 +103,12 @@ graph TB
 - **Route Handlers**: HTTP endpoint definitions
 - **Security Configuration**: 
   - CSRF protection via Flask-WTF
-  - Secure session cookies (configurable for production)
-  - Environment-based secret key management
-- **Database Initialization**: Automatic table creation on startup
+  - Secure session cookies (production-enforced)
+  - Strict environment-based secret key validation
+  - Security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
+- **Database Initialization**: Automatic table creation and migrations
+- **Logging**: Structured logging configuration for production observability
+- **Migration Support**: Flask-Migrate integration for schema management
 
 ### 2. Data Models (`models.py`)
 - **Assessment Model**: Stores assessment metadata and timestamps
@@ -131,6 +136,8 @@ graph TB
 
 ### 6. Testing (`tests/`)
 - **test_risk_logic.py**: Unit tests for risk calculation algorithms
+- **test_app_security.py**: Security header and configuration tests
+- **test_integration.py**: End-to-end integration tests for assessment flow
 - **Test Framework**: Python unittest
 
 ### 7. Report Generation Scripts
@@ -192,23 +199,24 @@ sequenceDiagram
 | Feature | Implementation | Purpose |
 |---------|---------------|---------|
 | **CSRF Protection** | Flask-WTF CSRFProtect | Prevents cross-site request forgery |
-| **Secure Sessions** | Flask session cookies | HTTPOnly cookies enabled |
-| **Secret Key Management** | Environment variables | Prevents hardcoded secrets |
+| **Secure Sessions** | Flask session cookies | HTTPOnly and Secure cookies (production) |
+| **Secret Key Management** | Environment variables (strict) | Enforced in production, fails if missing |
+| **Security Headers** | Custom middleware | HSTS, X-Frame-Options, X-Content-Type-Options |
 | **Non-root User** | Docker USER directive | Reduces container attack surface |
 | **Input Validation** | Flask form handling | Prevents injection attacks |
-| **Debug Mode** | Disabled in production | Prevents information disclosure |
+| **Debug Mode** | Environment-based | Disabled in production configuration |
 
 ### Production Recommendations
 
-> [!WARNING]
-> Before deploying to production, ensure the following:
+> [!NOTE]
+> Production security features have been implemented:
 
-1. **Enable HTTPS**: Set `SESSION_COOKIE_SECURE = True`
-2. **Set Strong Secret Key**: Use cryptographically random `SECRET_KEY`
-3. **Use Production WSGI Server**: Replace Flask development server with Gunicorn/uWSGI
-4. **Enable Database Backups**: Implement regular SQLite backup strategy
-5. **Configure Rate Limiting**: Add request throttling to prevent abuse
-6. **Review Security Headers**: Implement CSP, HSTS, X-Frame-Options
+1. ✅ **HTTPS Ready**: `SESSION_COOKIE_SECURE` enabled when `FLASK_ENV=production`
+2. ✅ **Strong Secret Key**: Strictly enforced from environment in production
+3. ✅ **Production WSGI Server**: Gunicorn configured with multi-worker setup
+4. ⚠️ **Database Backups**: Implement regular SQLite backup strategy (recommended)
+5. ⚠️ **Rate Limiting**: Add request throttling to prevent abuse (recommended)
+6. ✅ **Security Headers**: HSTS, X-Frame-Options, X-Content-Type-Options implemented
 
 ## Deployment
 
@@ -225,9 +233,13 @@ docker build -t aint-all-risky-bizz:latest .
 ```bash
 docker run -d -p 5000:5000 \
   -e SECRET_KEY="your-secret-key-here" \
+  -e FLASK_ENV="production" \
   --name risky-app \
   aint-all-risky-bizz:latest
 ```
+
+> [!IMPORTANT]
+> The container automatically runs database migrations on startup via `flask db upgrade`.
 
 **Container Features:**
 - **Base Image**: Python 3.11 Alpine Linux (lightweight)
@@ -253,13 +265,13 @@ Navigate to `http://localhost:5000`
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `FLASK_APP` | `app.py` | Flask application entry point |
-| `FLASK_RUN_HOST` | `0.0.0.0` | Bind address |
-| `SECRET_KEY` | `dev-secret-key-change-in-prod` | Flask secret key |
-| `SESSION_COOKIE_SECURE` | `False` | Enable for HTTPS only |
-| `PYTHONUNBUFFERED` | `1` | Disable Python output buffering |
+| Variable | Default | Production | Description |
+|----------|---------|------------|-------------|
+| `FLASK_APP` | `app.py` | `app.py` | Flask application entry point |
+| `FLASK_ENV` | - | `production` | Environment mode (enables strict security) |
+| `SECRET_KEY` | `dev-secret-key...` | **Required** | Flask secret key (fails if missing in prod) |
+| `SESSION_COOKIE_SECURE` | `False` | `True` | Automatic when FLASK_ENV=production |
+| `PYTHONUNBUFFERED` | `1` | `1` | Disable Python output buffering |
 
 ## Project Structure
 
@@ -268,10 +280,18 @@ d:/agy-projects/
 ├── app.py                          # Main Flask application
 ├── models.py                       # Database models (SQLAlchemy)
 ├── risk_logic.py                   # NIST 800-30 risk calculation engine
+├── gunicorn_config.py              # Gunicorn production configuration
 ├── requirements.txt                # Python dependencies
 ├── Dockerfile                      # Multi-stage Docker build
 ├── README.md                       # Project documentation
 ├── ARCHITECTURE.md                 # This file
+├── prod_ready_plan.md              # Production readiness plan
+├── risk_assessment_methodology_review.md  # Methodology review
+├── walkthrough.md                  # Production verification evidence
+│
+├── .github/                        # GitHub workflows
+│   └── workflows/
+│       └── ci.yml                  # CI/CD pipeline
 │
 ├── templates/                      # Jinja2 HTML templates
 │   ├── base.html                   # Base layout template
@@ -285,11 +305,23 @@ d:/agy-projects/
 │   ├── script.js                   # Client-side JavaScript
 │   └── favicon.png                 # Application icon
 │
+├── migrations/                     # Database migrations
+│   ├── alembic.ini                 # Alembic configuration
+│   ├── env.py                      # Migration environment
+│   └── versions/                   # Migration scripts
+│
 ├── instance/                       # Instance-specific files
 │   └── risk_assessment.db          # SQLite database
 │
 ├── tests/                          # Test suite
-│   └── test_risk_logic.py          # Risk logic unit tests
+│   ├── test_risk_logic.py          # Risk logic unit tests
+│   ├── test_app_security.py        # Security tests
+│   └── test_integration.py         # Integration tests
+│
+├── docs/                           # Documentation
+│   └── evidence/                   # Verification evidence
+│       ├── home_page.png
+│       └── wizard_step_1.png
 │
 └── reports/                        # Generated reports
     ├── Architecture_Overview.pdf
@@ -328,17 +360,36 @@ d:/agy-projects/
 - **Static Assets**: Minimal bundle size (~387 KB total)
 - **Container**: Optimized Alpine-based image for fast startup and low memory footprint
 
+## Production Readiness Status
+
+### ✅ Completed
+- [x] Gunicorn WSGI server for production
+- [x] Database migrations (Flask-Migrate)
+- [x] Structured logging configuration
+- [x] Security headers (HSTS, X-Frame-Options, etc.)
+- [x] Strict environment variable validation
+- [x] CI/CD pipeline (GitHub Actions)
+- [x] Integration and security tests
+- [x] Docker multi-stage build optimization
+
+### 🔄 Recommended
+- [ ] PostgreSQL migration for production scale
+- [ ] Redis for session storage
+- [ ] Rate limiting middleware
+- [ ] Automated database backups
+
 ## Future Enhancements
 
 - [ ] Export assessments to PDF/CSV
-- [ ] Multi-user support with authentication
+- [ ] Multi-user support with authentication (RBAC)
 - [ ] Assessment templates and presets
-- [ ] Historical trend analysis
+- [ ] Historical trend analysis dashboard
 - [ ] API endpoints for integration
-- [ ] Real-time collaboration features
+- [ ] Real-time threat intelligence feeds
 
 ---
 
-**Version**: 1.0  
+**Version**: 2.0 (Production Ready)  
 **Last Updated**: 2025-11-28  
-**Maintained By**: silver3parre
+**Maintained By**: silver3parre  
+**Branch**: `production`
