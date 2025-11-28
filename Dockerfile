@@ -58,4 +58,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:5000/ || exit 1
 
 # Run the application
-CMD ["flask", "run"]
+# Copy gunicorn config
+COPY gunicorn_config.py ./
+
+# Run the application with Gunicorn
+CMD ["gunicorn", "-c", "gunicorn_config.py", "app:app"]
