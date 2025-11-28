@@ -37,6 +37,14 @@
             <p><strong>Impact Level:</strong> {{ risk.impact_level }}</p>
             <p><strong>Est. Financial Impact:</strong> ${{ risk.financial_impact }}</p>
         </div>
+
+        <div class="detail-card">
+            <h3>Business Impact Analysis</h3>
+            <p><strong>Reputation Damage:</strong> {{ risk.bia_reputation }}</p>
+            <p><strong>Legal/Regulatory:</strong> {{ risk.bia_legal }}</p>
+            <p><strong>Operational Disruption:</strong> {{ risk.bia_operational }}</p>
+            <p><strong>Safety/Health:</strong> {{ risk.bia_safety }}</p>
+        </div>
     </div>
 
     <div class="actions">

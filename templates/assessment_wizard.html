@@ -95,6 +95,19 @@
                 <label for="threat_event">Threat Event Description</label>
                 <input type="text" id="threat_event" name="threat_event" required placeholder="e.g. Phishing Campaign">
             </div>
+
+            {% if suggested_threats %}
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="suggested_threats">Suggested Threats (Based on Asset Type)</label>
+                <select id="suggested_threats" onchange="document.getElementById('threat_event').value = this.value">
+                    <option value="">-- Select a Suggested Threat --</option>
+                    {% for threat in suggested_threats %}
+                    <option value="{{ threat.name }} ({{ threat.id }})">{{ threat.name }} ({{ threat.id }}) - {{
+                        threat.description }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
         </div>
 
         {% elif step == 4 %}
@@ -398,6 +411,45 @@
                     <input type="radio" name="impact_level" value="5">
                     <span class="card-content"><span class="level">Very High</span></span>
                 </label>
+            </div>
+
+            <!-- Business Impact Analysis (BIA) Fields -->
+            <div class="bia-section" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                <h3>Business Impact Analysis (BIA)</h3>
+                <p class="step-desc">Rate the potential impact on specific business areas.</p>
+
+                <div class="form-group">
+                    <label>Reputation Damage</label>
+                    <select name="bia_reputation">
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Legal/Regulatory Fines</label>
+                    <select name="bia_legal">
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Operational Disruption</label>
+                    <select name="bia_operational">
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Safety/Health Impact</label>
+                    <select name="bia_safety">
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
             </div>
 
             <!-- CRQ: Financial Impact Field -->

@@ -83,7 +83,11 @@ def calculate_risk_details(data):
             'asset_name': data.get('asset_name'),
             'asset_type': data.get('asset_type'),
             'asset_valuation': data.get('asset_valuation'),
-            'financial_impact': data.get('financial_impact')
+            'financial_impact': data.get('financial_impact'),
+            'bia_reputation': data.get('bia_reputation'),
+            'bia_legal': data.get('bia_legal'),
+            'bia_operational': data.get('bia_operational'),
+            'bia_safety': data.get('bia_safety')
         }
     except (ValueError, TypeError):
         return {

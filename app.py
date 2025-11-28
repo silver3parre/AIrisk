@@ -94,7 +94,15 @@ def assessment_step(step_id):
             return redirect(url_for('assessment_result'))
         return redirect(url_for('assessment_step', step_id=next_step))
     
-    return render_template('assessment_wizard.html', step=step_id)
+    # Threat Intel Integration
+    suggested_threats = []
+    if step_id == 3:
+        from threat_intel import get_suggested_threats
+        asset_type = session.get('assessment_data', {}).get('asset_type')
+        if asset_type:
+            suggested_threats = get_suggested_threats(asset_type)
+
+    return render_template('assessment_wizard.html', step=step_id, suggested_threats=suggested_threats)
 
 @app.route('/assessment/result')
 def assessment_result():
