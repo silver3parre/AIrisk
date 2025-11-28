@@ -3,6 +3,28 @@ from models import db, Assessment, RiskEntry
 import os
 from flask_wtf.csrf import CSRFProtect
 
+from flask_migrate import Migrate
+
+import logging
+from logging.config import dictConfig
+
+# Configure logging
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 app = Flask(__name__)
 # Security Configuration
 if os.environ.get('FLASK_ENV') == 'production':
@@ -22,6 +44,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 csrf = CSRFProtect(app)
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 
 @app.after_request

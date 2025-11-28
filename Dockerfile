@@ -62,4 +62,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 COPY gunicorn_config.py ./
 
 # Run the application with Gunicorn
-CMD ["gunicorn", "-c", "gunicorn_config.py", "app:app"]
+CMD ["sh", "-c", "flask db upgrade && gunicorn -c gunicorn_config.py app:app"]
