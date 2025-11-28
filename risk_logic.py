@@ -79,7 +79,11 @@ def calculate_risk_details(data):
             'overall_likelihood': get_likelihood_level(overall_likelihood),
             'impact_level': get_impact_level(impact),
             'risk_level': get_risk_level(risk_score),
-            'risk_score': risk_score
+            'risk_score': risk_score,
+            'asset_name': data.get('asset_name'),
+            'asset_type': data.get('asset_type'),
+            'asset_valuation': data.get('asset_valuation'),
+            'financial_impact': data.get('financial_impact')
         }
     except (ValueError, TypeError):
         return {

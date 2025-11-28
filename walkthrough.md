@@ -1,13 +1,3 @@
-# Production Verification Walkthrough
-
-## Overview
-This document provides evidence that the production-ready application has been successfully built, deployed (via Docker), and verified.
-
-## Verification Steps
-
-### 1. Docker Build
-The Docker image `risk-app-prod` was built successfully using the multi-stage Dockerfile.
-- **Base Image**: Python 3.11 Alpine
 - **WSGI Server**: Gunicorn
 - **Security**: Non-root user, environment-based configuration.
 

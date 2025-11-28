@@ -90,7 +90,7 @@ def assessment_step(step_id):
         session['assessment_data'] = current_data
         
         next_step = step_id + 1
-        if next_step > 10: # Updated to 10 steps for detailed Adversarial assessment
+        if next_step > 11: # Updated to 11 steps: Asset + 10 original steps
             return redirect(url_for('assessment_result'))
         return redirect(url_for('assessment_step', step_id=next_step))
     

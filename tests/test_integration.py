@@ -24,37 +24,42 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Step 1', response.data)
 
-        # 2. Submit Step 1 (Threat Source)
-        response = self.app.post('/assessment/step/1', data={'threat_source': 'External Hacker'}, follow_redirects=True)
+        # 2. Submit Step 1 (Asset Identification) [NEW]
+        response = self.app.post('/assessment/step/1', data={
+            'asset_name': 'Customer DB',
+            'asset_type': 'Data',
+            'asset_valuation': '100000'
+        }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Step 2', response.data)
 
-        # 3. Submit Step 2 (Threat Event)
-        response = self.app.post('/assessment/step/2', data={'threat_event': 'SQL Injection'}, follow_redirects=True)
+        # 3. Submit Step 2 (Threat Source) [Formerly Step 1]
+        response = self.app.post('/assessment/step/2', data={'threat_source': 'External Hacker'}, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Step 3', response.data)
 
-        # Simulate skipping to result (assuming we fill necessary data in session or steps are optional/handled)
-        # For this test, let's just jump to result if logic allows, or fill minimums.
-        # The app logic checks step > 10 to go to result.
-        
-        # Let's fast forward through steps 3-10 with dummy data
-        for i in range(3, 11):
+        # 4. Submit Step 3 (Threat Event) [Formerly Step 2]
+        response = self.app.post('/assessment/step/3', data={'threat_event': 'SQL Injection'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Step 4', response.data)
+
+        # Fast forward through steps 4-11
+        for i in range(4, 12):
             data = {}
-            if i == 7: data = {'likelihood_initiation': '3'}
-            if i == 8: data = {'likelihood_impact': '4'}
-            if i == 10: data = {'impact_level': '5'}
+            if i == 8: data = {'likelihood_initiation': '3'} # Step 7 -> 8
+            if i == 9: data = {'likelihood_impact': '4'}     # Step 8 -> 9
+            if i == 11: data = {'impact_level': '5', 'financial_impact': '50000'} # Step 10 -> 11
             
             response = self.app.post(f'/assessment/step/{i}', data=data, follow_redirects=True)
             self.assertEqual(response.status_code, 200)
 
-        # After step 10, should be at result
+        # After step 11, should be at result
         self.assertIn(b'Risk Assessment Result', response.data)
         
         # Verify Risk Calculation Display
-        # 3 (Mod) x 4 (High) -> Overall Likelihood 4 (High)
-        # Likelihood 4 (High) x Impact 5 (Very High) -> Risk 5 (Very High)
         self.assertIn(b'Very High', response.data)
+        self.assertIn(b'Customer DB', response.data) # Verify Asset Name
+        self.assertIn(b'50000', response.data)       # Verify Financial Impact
 
 if __name__ == '__main__':
     unittest.main()

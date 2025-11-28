@@ -13,6 +13,13 @@
 
     <div class="details-grid">
         <div class="detail-card">
+            <h3>Asset Profile</h3>
+            <p><strong>Asset Name:</strong> {{ risk.asset_name }}</p>
+            <p><strong>Asset Type:</strong> {{ risk.asset_type }}</p>
+            <p><strong>Asset Valuation:</strong> ${{ risk.asset_valuation }}</p>
+        </div>
+
+        <div class="detail-card">
             <h3>Threat Profile</h3>
             <p><strong>Threat Event:</strong> {{ risk.threat_event }}</p>
             <p><strong>Threat Source:</strong> {{ risk.threat_source }}</p>
@@ -28,6 +35,7 @@
             <p><strong>Likelihood of Impact:</strong> {{ risk.likelihood_impact }}</p>
             <p><strong>Overall Likelihood:</strong> {{ risk.overall_likelihood }}</p>
             <p><strong>Impact Level:</strong> {{ risk.impact_level }}</p>
+            <p><strong>Est. Financial Impact:</strong> ${{ risk.financial_impact }}</p>
         </div>
     </div>
 
