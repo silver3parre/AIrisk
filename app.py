@@ -1,0 +1,75 @@
+from flask import Flask, render_template, request, redirect, url_for, session
+from models import db, Assessment, RiskEntry
+import os
+from flask_wtf.csrf import CSRFProtect
+
+app = Flask(__name__)
+# Security Fix: Use environment variable for SECRET_KEY
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///risk_assessment.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Security Fix: Secure Cookies (Enable in production with HTTPS)
+# Security Fix: Secure Cookies (Enable in production with HTTPS)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False # Set to True in production with HTTPS
+
+csrf = CSRFProtect(app)
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/assessment/start')
+def start_assessment():
+    # Create a new assessment session
+    # For simplicity in this guided flow, we might just use session storage 
+    # or create a DB entry immediately. Let's use session for the wizard state.
+    session.clear()
+    session['step'] = 1
+    session['assessment_data'] = {}
+    return redirect(url_for('assessment_step', step_id=1))
+
+@app.route('/assessment/step/<int:step_id>', methods=['GET', 'POST'])
+def assessment_step(step_id):
+    if request.method == 'POST':
+        # Save data from current step
+        data = request.form
+        if 'assessment_data' not in session:
+            session['assessment_data'] = {}
+        
+        # Update session data
+        current_data = session['assessment_data']
+        for key, value in data.items():
+            current_data[key] = value
+        session['assessment_data'] = current_data
+        
+        next_step = step_id + 1
+        if next_step > 10: # Updated to 10 steps for detailed Adversarial assessment
+            return redirect(url_for('assessment_result'))
+        return redirect(url_for('assessment_step', step_id=next_step))
+    
+    return render_template('assessment_wizard.html', step=step_id)
+
+@app.route('/assessment/result')
+def assessment_result():
+    data = session.get('assessment_data', {})
+    # Here we would calculate the risk
+    # For now, just render the template
+    from risk_logic import calculate_risk_details
+    
+    risk_details = calculate_risk_details(data)
+    
+    return render_template('result.html', risk=risk_details)
+
+if __name__ == '__main__':
+    # Security Fix: Disable debug mode in production
+    app.run(debug=False)

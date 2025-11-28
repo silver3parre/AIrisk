@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="about-section">
+    <h1>About This Tool</h1>
+    <p class="lead">A guided risk assessment tool focused on Adversarial Threats based on NIST SP 800-30 Revision 1.</p>
+
+    <div class="content-block">
+        <h2>Adversarial Risk Focus</h2>
+        <p>This tool is specifically designed to assess risks from <strong>Adversarial Threat Sources</strong> (e.g.,
+            hackers, insiders, nation-states). It follows the structure of the standard in Appendix I of
+            NIST SP 800-30 Rev 1.</p>
+    </div>
+
+    <div class="content-block">
+        <h2>Key Assessment Factors</h2>
+        <ul>
+            <li><strong>Capability:</strong> The resources and expertise available to the adversary.</li>
+            <li><strong>Intent:</strong> The motivation and willingness of the adversary to attack.</li>
+            <li><strong>Targeting:</strong> The degree to which the adversary is focused on specific assets or the
+                organization.</li>
+        </ul>
+        <p>These factors help determine the <strong>Likelihood of Initiation</strong>, which is then combined with the
+            <strong>Likelihood of Adverse Impact</strong> and the <strong>Impact Level</strong> to calculate the overall
+            Risk.
+        </p>
+    </div>
+
+    <div class="cta-block">
+        <p>Ready to evaluate your system?</p>
+        <a href="{{ url_for('start_assessment') }}" class="btn-primary">Start Risk Assessment</a>
+    </div>
+</section>
+{% endblock %}

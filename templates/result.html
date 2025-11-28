@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="result-container">
+    <h1>Risk Assessment Result</h1>
+
+    <div class="risk-summary {{ risk.risk_level|lower|replace(' ', '-') }}">
+        <div class="risk-score">
+            <span class="label">Risk Level</span>
+            <span class="value">{{ risk.risk_level }}</span>
+        </div>
+    </div>
+
+    <div class="details-grid">
+        <div class="detail-card">
+            <h3>Threat Profile</h3>
+            <p><strong>Threat Event:</strong> {{ risk.threat_event }}</p>
+            <p><strong>Threat Source:</strong> {{ risk.threat_source }}</p>
+            <p><strong>Capability:</strong> {{ risk.capability }}</p>
+            <p><strong>Intent:</strong> {{ risk.intent }}</p>
+            <p><strong>Targeting:</strong> {{ risk.targeting }}</p>
+        </div>
+
+        <div class="detail-card">
+            <h3>Analysis</h3>
+            <p><strong>Vulnerability:</strong> {{ risk.vulnerability }}</p>
+            <p><strong>Likelihood of Initiation:</strong> {{ risk.likelihood_initiation }}</p>
+            <p><strong>Likelihood of Impact:</strong> {{ risk.likelihood_impact }}</p>
+            <p><strong>Overall Likelihood:</strong> {{ risk.overall_likelihood }}</p>
+            <p><strong>Impact Level:</strong> {{ risk.impact_level }}</p>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('index') }}" class="btn-secondary">Back to Home</a>
+        <a href="{{ url_for('start_assessment') }}" class="btn-primary">Start New Assessment</a>
+    </div>
+</div>
+{% endblock %}
