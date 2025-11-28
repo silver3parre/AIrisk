@@ -124,6 +124,12 @@ graph TB
 ### 3. Risk Calculation Engine (`risk_logic.py`)
 - **NIST 800-30 Implementation**: Semi-quantitative risk matrices
 - **Likelihood Calculation**: Combines initiation and impact likelihood
+- **Zero Trust Alignment**: Automatically elevates likelihood ratings for insider threats
+  - Insider/Privileged/Trusted Insider threats: minimum likelihood set to 3 (Moderate)
+  - Implements "Assume Breach" principle
+- **SCRM Tagging**: Automatically identifies and tags supply chain risks
+  - Vendor/Supplier threats: marked with [SCRM] designation
+  - Enhanced visibility for third-party risk management  
 - **Risk Level Determination**: Matrix-based risk scoring (Very Low → Very High)
 - **Qualitative Descriptors**: Maps numeric scores to risk categories
 

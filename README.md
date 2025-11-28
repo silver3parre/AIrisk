@@ -8,6 +8,8 @@ A web-based guided risk assessment tool based on NIST Special Publication 800-30
 - **Guided Assessment Wizard**: 11-step process guiding through threat identification, vulnerability analysis, and impact assessment.
 - **Business Impact Analysis (BIA)**: Evaluate potential damage across reputation, legal/regulatory, operational, and safety areas.
 - **Cyber Risk Quantification (CRQ)**: Estimate financial impact of identified risks.
+- **Zero Trust Alignment**: Automatically elevates likelihood ratings for insider threats (assumes breach principle).
+- **Supply Chain Risk Management (SCRM)**: Automatically tags vendor/supplier threats for enhanced visibility.
 - **NIST 800-30 Compliance**: Utilizes standard tables and semi-quantitative scales (1-5) for likelihood and impact.
 - **Assessment Dashboard**: View, manage, and save completed risk assessments.
 - **Visual Risk Calculation**: Automatically calculates overall likelihood and risk level based on user inputs.
