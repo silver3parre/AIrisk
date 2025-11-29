@@ -1,78 +1,43 @@
-# NIST 800-30 Risk Assessment Application
+# Ain't all Risky Bizz
 
-A web-based guided risk assessment tool based on NIST Special Publication 800-30 Revision 1. This application guides users through the process of identifying threats, vulnerabilities, and impacts to calculate a semi-quantitative risk score.
+A guided, qualitative risk assessment tool for modern threats, based on NIST SP 800-30 Rev 1.
 
 ## Features
 
-- **Asset-Centric Assessment**: Start with asset identification (name, type, valuation) to contextualize risk.
-- **Guided Assessment Wizard**: 11-step process guiding through threat identification, vulnerability analysis, and impact assessment.
-- **Business Impact Analysis (BIA)**: Evaluate potential damage across reputation, legal/regulatory, operational, and safety areas.
-- **Cyber Risk Quantification (CRQ)**: Estimate financial impact of identified risks.
-- **Zero Trust Alignment**: Automatically elevates likelihood ratings for insider threats (assumes breach principle).
-- **Supply Chain Risk Management (SCRM)**: Automatically tags vendor/supplier threats for enhanced visibility.
-- **NIST 800-30 Compliance**: Utilizes standard tables and semi-quantitative scales (1-5) for likelihood and impact.
-- **Assessment Dashboard**: View, manage, and save completed risk assessments.
-- **Visual Risk Calculation**: Automatically calculates overall likelihood and risk level based on user inputs.
-- **Clean Interface**: Modern, responsive design for a professional user experience.
+*   **NIST 800-30 Compliant**: Utilizes standard tables and scales for consistent risk evaluation.
+*   **Adversarial Focus**: Tailored for assessing risks from active threat actors (hackers, insiders, nation-states).
+*   **Zero Trust Alignment**: Automatically applies "Assume Breach" principles, elevating risk scores for insider threats.
+*   **Supply Chain Risk Management (SCRM)**: Identifies and tags risks originating from vendors and suppliers.
+*   **Business Impact Analysis (BIA)**: Evaluates Reputation, Legal, Operational, and Safety impacts.
+*   **Cyber Risk Quantification (CRQ)**: Estimates potential financial loss for better decision-making.
+*   **Role-Based Access Control (RBAC)**:
+    *   **Viewer**: Read-only access to dashboard and reports.
+    *   **Analyst**: Create, scope, and complete assessments.
+    *   **Admin**: Full access including assessment deletion.
+*   **Tailored Scoping**: Pre-assessment scoping phase to define security categorization and system boundaries.
 
-## Tech Stack
+## Getting Started
 
-- **Backend**: Python, Flask, SQLAlchemy
-- **Database**: SQLite
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Production**: Gunicorn, Docker, GitHub Actions
-
-## Setup and Installation
-
-### Local Development
-1.  **Clone the repository**.
-2.  **Install Dependencies**:
+1.  **Install Dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
-3.  **Initialize Database**:
-    ```bash
-    flask db upgrade
-    ```
-4.  **Run the Application**:
+2.  **Run the Application**:
     ```bash
     python app.py
     ```
-
-### Production Deployment (Docker)
-1.  **Build the Image**:
-    ```bash
-    docker build -t risk-app .
-    ```
-2.  **Run the Container**:
-    ```bash
-    docker run -d -p 5000:5000 \
-      -e SECRET_KEY="your-production-secret-key" \
-      -e FLASK_ENV="production" \
-      risk-app
-    ```
-    *Note: The container automatically runs database migrations on startup.*
+3.  **Access the App**:
+    Open your browser and navigate to `http://localhost:5000`.
 
 ## Usage
 
-1.  Click **Start Assessment** from the home page.
-2.  Follow the 11-step wizard:
-    - **Step 1**: Identify Asset (name, type, valuation)
-    - **Step 2**: Identify Adversarial Threat Source
-    - **Step 3**: Identify Threat Event (with optional suggested threats)
-    - **Step 4**: Assess Adversary Capability
-    - **Step 5**: Assess Adversary Intent
-    - **Step 6**: Assess Adversary Targeting
-    - **Step 7**: Determine Likelihood of Initiation
-    - **Step 8**: Identify Vulnerability
-    - **Step 9**: Determine Likelihood of Adverse Impact
-    - **Step 10**: Determine Impact Level + Business Impact Analysis
-    - **Step 11**: Review
-3.  View the **Risk Assessment Result** page to see the calculated risk level, asset profile, threat analysis, and business impact.
-4.  **Save Assessment** to persist results for future reference.
-5.  Access the **Dashboard** to view and manage all saved assessments.
+1.  **Login**: Use one of the predefined roles (e.g., `analyst` / `Analyst`).
+2.  **Start Assessment**: Click "Start Assessment" to begin.
+3.  **Scope**: Define the assessment title, security categorization, and system description.
+4.  **Identify Asset**: Define the primary asset at risk.
+5.  **Assess Risks**: Follow the wizard to identify threat sources, events, vulnerabilities, and impacts.
+6.  **Review Results**: View the calculated risk score and detailed report.
 
-## Customization
+## License
 
-- **Risk Logic**: Modify `risk_logic.py` to adjust the risk calculation matrices.
-- **Styling**: Edit `static/style.css` to change the look and feel.
+[MIT License](LICENSE)
