@@ -2,28 +2,35 @@
 
 {% block content %}
 <section class="hero">
-    <section class="hero">
-        <img src="{{ url_for('static', filename='favicon.png') }}" alt="Logo" class="hero-logo">
-        <h1>Ain’t all Risky <span class="highlight">Bizz</span></h1>
-        <p>A guided, qualitative risk assessment tool for modern threats.</p>
-        <div class="hero-actions">
-            <a href="{{ url_for('start_assessment') }}" class="btn-primary">Start New Assessment</a>
-            <a href="{{ url_for('about') }}" class="btn-secondary">Learn More</a>
-        </div>
-    </section>
+    <img src="{{ url_for('static', filename='favicon.png') }}" alt="Logo" class="hero-logo">
+    <h1>Ain’t all Risky <span class="highlight">Bizz</span></h1>
+    <p>A guided, qualitative risk assessment tool for modern threats.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('start_assessment') }}" class="btn-primary">Start New Assessment</a>
+        <a href="{{ url_for('about') }}" class="btn-secondary">Learn More</a>
+    </div>
+</section>
 
-    <section class="features">
-        <div class="feature-card">
-            <h3>Adversarial Focus</h3>
-            <p>Tailored for assessing risks from active threat actors.</p>
-        </div>
-        <div class="feature-card">
-            <h3>NIST 800-30 Compliant</h3>
-            <p>Utilizes standard tables and scales from SP 800-30 Rev 1.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Qualitative Analysis</h3>
-            <p>Simple, descriptive scales for easier estimation.</p>
-        </div>
-    </section>
-    {% endblock %}
+<section class="features">
+    <div class="feature-card">
+        <h3>Scoping & Asset-Centric</h3>
+        <p>Define assessment scope and value assets to contextualize risk.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Adversarial Focus</h3>
+        <p>Tailored for assessing risks from active threat actors (hackers, insiders).</p>
+    </div>
+    <div class="feature-card">
+        <h3>NIST 800-30 Compliant</h3>
+        <p>Utilizes standard tables and scales from SP 800-30 Rev 1.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Advanced Analysis</h3>
+        <p>Includes Business Impact Analysis (BIA) and Cyber Risk Quantification (CRQ).</p>
+    </div>
+    <div class="feature-card">
+        <h3>Zero Trust Aligned</h3>
+        <p>Automatically adjusts for insider threats and supply chain risks.</p>
+    </div>
+</section>
+{% endblock %}

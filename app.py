@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from models import db, Assessment, RiskEntry, Asset
 import os
 from flask_wtf.csrf import CSRFProtect
-
 from flask_migrate import Migrate
-
+from functools import wraps
 import logging
 from logging.config import dictConfig
 
@@ -43,6 +42,49 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 csrf = CSRFProtect(app)
 
+# RBAC Decorators
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_role' not in session:
+            flash('Please login to access this page.', 'warning')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def role_required(allowed_roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_role' not in session:
+                return redirect(url_for('login'))
+            if session['user_role'] not in allowed_roles:
+                flash('You do not have permission to access this page.', 'danger')
+                return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        role = request.form.get('role')
+        
+        if username and role:
+            session['username'] = username
+            session['user_role'] = role
+            flash(f'Welcome, {username}! Logged in as {role}.', 'success')
+            return redirect(url_for('index'))
+            
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
+
 db.init_app(app)
 migrate = Migrate(app, db)
 
@@ -62,20 +104,41 @@ def index():
     return render_template('index.html')
 
 @app.route('/about')
+@login_required
 def about():
     return render_template('about.html')
 
 @app.route('/assessment/start')
+@login_required
+@role_required(['Analyst', 'Admin'])
 def start_assessment():
-    # Create a new assessment session
-    # For simplicity in this guided flow, we might just use session storage 
-    # or create a DB entry immediately. Let's use session for the wizard state.
-    session.clear()
-    session['step'] = 1
-    session['assessment_data'] = {}
-    return redirect(url_for('assessment_step', step_id=1))
+    # Redirect to Scoping first (Suggestion 10)
+    return redirect(url_for('assessment_scope'))
+
+@app.route('/assessment/scope', methods=['GET', 'POST'])
+@login_required
+@role_required(['Analyst', 'Admin'])
+def assessment_scope():
+    if request.method == 'POST':
+        # Don't clear the whole session, just reset assessment data
+        session.pop('assessment_data', None)
+        session.pop('step', None)
+        
+        session['assessment_data'] = {}
+        session['step'] = 1
+        
+        # Save Scope Data to Session
+        session['assessment_data']['title'] = request.form.get('assessment_title')
+        session['assessment_data']['security_categorization'] = request.form.get('security_categorization')
+        session['assessment_data']['description'] = request.form.get('system_description')
+        
+        return redirect(url_for('assessment_step', step_id=1))
+        
+    return render_template('scope.html')
 
 @app.route('/assessment/step/<int:step_id>', methods=['GET', 'POST'])
+@login_required
+@role_required(['Analyst', 'Admin'])
 def assessment_step(step_id):
     if request.method == 'POST':
         # Save data from current step
@@ -127,6 +190,7 @@ def assessment_step(step_id):
     return render_template('assessment_wizard.html', step=step_id, suggested_threats=suggested_threats)
 
 @app.route('/assessment/result')
+@login_required
 def assessment_result():
     data = session.get('assessment_data', {})
     # Here we would calculate the risk
@@ -138,18 +202,31 @@ def assessment_result():
     return render_template('result.html', risk=risk_details)
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     assessments = Assessment.query.order_by(Assessment.date_created.desc()).all()
     return render_template('dashboard.html', assessments=assessments)
 
 @app.route('/assessment/save', methods=['POST'])
+@login_required
+@role_required(['Analyst', 'Admin'])
 def save_assessment():
     data = session.get('assessment_data')
     if not data:
         return redirect(url_for('index'))
     
     # Create Assessment
-    assessment = Assessment(status='Completed')
+    assessment = Assessment(
+        status='Completed',
+        title=data.get('title', 'Untitled Assessment'),
+        security_categorization=data.get('security_categorization'),
+        description=data.get('description'),
+        created_by=session.get('username')
+    )
+    # Explicitly set title to ensure it's not overwritten by default
+    if data.get('title'):
+        assessment.title = data.get('title')
+        
     db.session.add(assessment)
     db.session.flush() # Get ID
     
@@ -157,17 +234,12 @@ def save_assessment():
     asset = Asset(
         assessment_id=assessment.id,
         name=data.get('asset_name', 'Unknown Asset'),
-        asset_type=data.get('asset_type', 'Unknown'),
-        valuation=float(data.get('asset_valuation', 0) or 0)
+        asset_type=data.get('asset_type'),
+        valuation=data.get('asset_valuation')
     )
     db.session.add(asset)
-    db.session.flush()
     
     # Create Risk Entry
-    # Calculate risk scores again or rely on what's in data if we stored it? 
-    # The models.py RiskEntry has fields for the inputs, let's store them.
-    # We need to calculate the scores to store them if they aren't in session data directly as simple values
-    
     from risk_logic import calculate_overall_likelihood, calculate_risk
     
     l_init = int(data.get('likelihood_initiation', 1))
@@ -179,7 +251,7 @@ def save_assessment():
     
     risk_entry = RiskEntry(
         assessment_id=assessment.id,
-        asset_id=asset.id,
+        asset_id=asset.id, # Will be linked after flush/commit
         threat_source=data.get('threat_source'),
         threat_event=data.get('threat_event'),
         capability=data.get('capability'),
@@ -190,16 +262,31 @@ def save_assessment():
         likelihood_impact=l_impact,
         overall_likelihood=overall_likelihood,
         impact_level=impact,
-        financial_impact=float(data.get('financial_impact', 0) or 0),
+        financial_impact=data.get('financial_impact'),
         risk_level=risk_score
     )
     db.session.add(risk_entry)
     db.session.commit()
     
-    # Clear session or keep it? Let's clear the wizard data
+    # Clear Assessment Data from Session
     session.pop('assessment_data', None)
     session.pop('step', None)
     
+    return redirect(url_for('dashboard'))
+
+@app.route('/assessment/delete/<int:assessment_id>', methods=['POST'])
+@login_required
+@role_required(['Admin'])
+def delete_assessment(assessment_id):
+    assessment = Assessment.query.get_or_404(assessment_id)
+    
+    # Delete associated assets and risk entries
+    RiskEntry.query.filter_by(assessment_id=assessment.id).delete()
+    Asset.query.filter_by(assessment_id=assessment.id).delete()
+    
+    db.session.delete(assessment)
+    db.session.commit()
+    flash('Assessment deleted successfully.', 'success')
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':

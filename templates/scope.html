@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="wizard-container">
+    <div class="step-content">
+        <h2>Pre-Assessment Scoping</h2>
+        <p class="step-desc">Define the scope and context of this risk assessment.</p>
+
+        <form method="POST" class="wizard-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="assessment_title">Assessment Title</label>
+                <input type="text" id="assessment_title" name="assessment_title" required
+                    placeholder="e.g. Q4 2025 Core Banking System Assessment">
+            </div>
+
+            <div class="form-group">
+                <label for="security_categorization">Security Categorization (FIPS 199)</label>
+                <select id="security_categorization" name="security_categorization" required>
+                    <option value="">Select Categorization</option>
+                    <option value="Low">Low (Limited adverse effect)</option>
+                    <option value="Moderate">Moderate (Serious adverse effect)</option>
+                    <option value="High">High (Severe/Catastrophic adverse effect)</option>
+                </select>
+                <small>Based on the potential impact to Confidentiality, Integrity, and Availability.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="system_description">System Description & Boundaries</label>
+                <textarea id="system_description" name="system_description" rows="4" required
+                    placeholder="Describe the system, its boundaries, and key components included in this assessment."></textarea>
+            </div>
+
+            <div class="wizard-actions">
+                <button type="submit" class="btn-primary">Begin Assessment Wizard</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

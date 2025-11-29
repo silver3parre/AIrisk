@@ -27,12 +27,29 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('about') }}">About</a>
                 </li>
+                {% if session.get('username') %}
+                <li class="nav-item">
+                    <span class="nav-link" style="color: #666;">{{ session.username }} ({{ session.user_role }})</span>
+                </li>
+                <li><a href="{{ url_for('logout') }}" class="btn-nav btn-secondary">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}" class="btn-nav">Login</a></li>
+                {% endif %}
+                {% if session.get('user_role') in ['Analyst', 'Admin'] %}
                 <li><a href="{{ url_for('start_assessment') }}" class="btn-nav">Start Assessment</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
 
     <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
 

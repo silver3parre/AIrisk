@@ -7,7 +7,14 @@ class Assessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(50), default='Draft') # Draft, Completed
-    # Could add user info here if we had auth
+    
+    # Scoping Data (Suggestion 10)
+    title = db.Column(db.String(200), default='Untitled Assessment')
+    security_categorization = db.Column(db.String(50)) # Low, Moderate, High
+    description = db.Column(db.Text)
+    
+    # User Info (Suggestion 9)
+    created_by = db.Column(db.String(100)) # Username
 
 class Asset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
