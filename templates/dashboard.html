@@ -1,96 +1,113 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h2>Assessment Dashboard</h2>
-        <p class="lead">Manage and review your risk assessments.</p>
+<div class="row mb-4 fade-in">
+    <div class="col-md-12" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Assessment Dashboard</h2>
+            <p class="text-muted">Manage and review your risk assessments.</p>
+        </div>
+        <a href="{{ url_for('start_assessment') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg" style="margin-right: 0.5rem;"></i> New Assessment
+        </a>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-list-check"></i> Past Assessments
-            </div>
-            <div class="card-body">
-                {% if assessments %}
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Date</th>
-                            <th>Categorization</th>
-                            <th>Asset Name</th>
-                            <th>Risk Level</th>
-                            <th>Created By</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for assessment in assessments %}
-                        <tr>
-                            <td>
-                                <strong>{{ assessment.title or 'Untitled' }}</strong><br>
-                                <small class="text-muted">ID: {{ assessment.id }}</small>
-                            </td>
-                            <td>{{ assessment.date_created.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                {% if assessment.security_categorization == 'High' %}
-                                <span class="badge bg-danger">High</span>
-                                {% elif assessment.security_categorization == 'Moderate' %}
-                                <span class="badge bg-warning text-dark">Moderate</span>
-                                {% elif assessment.security_categorization == 'Low' %}
-                                <span class="badge bg-success">Low</span>
-                                {% else %}
-                                <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if assessment.assets %}
-                                {{ assessment.assets[0].name }}
-                                {% else %}
-                                <span class="text-muted">N/A</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if assessment.entries %}
-                                {% set risk_level = assessment.entries[0].risk_level %}
-                                {% if risk_level >= 4 %}
-                                <span class="badge bg-danger">High ({{ risk_level }})</span>
-                                {% elif risk_level == 3 %}
-                                <span class="badge bg-warning text-dark">Moderate ({{ risk_level }})</span>
-                                {% else %}
-                                <span class="badge bg-success">Low ({{ risk_level }})</span>
-                                {% endif %}
-                                {% else %}
-                                <span class="text-muted">N/A</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ assessment.created_by or 'Unknown' }}</td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-outline-secondary disabled">View</a>
-                                {% if session.get('user_role') == 'Admin' %}
-                                <form action="{{ url_for('delete_assessment', assessment_id=assessment.id) }}"
-                                    method="POST" style="display:inline;"
-                                    onsubmit="return confirm('Are you sure you want to delete this assessment?');">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                </form>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <div class="alert alert-info">
-                    No assessments found. <a href="{{ url_for('start_assessment') }}">Start a new assessment</a>.
-                </div>
-                {% endif %}
-            </div>
+<div class="card fade-in" style="animation-delay: 0.1s;">
+    <div class="card-header">
+        <i class="bi bi-list-check" style="color: var(--primary-color);"></i> Past Assessments
+    </div>
+    <div class="card-body" style="padding: 0;">
+        {% if assessments %}
+        <div style="overflow-x: auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Categorization</th>
+                        <th>Asset Name</th>
+                        <th>Risk Level</th>
+                        <th>Created By</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assessment in assessments %}
+                    <tr style="transition: background-color 0.2s;">
+                        <td>
+                            <div style="font-weight: 600; color: var(--text-color);">{{ assessment.title or 'Untitled'
+                                }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-light);">ID: {{ assessment.id }}</div>
+                        </td>
+                        <td>{{ assessment.date_created.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if assessment.security_categorization == 'High' %}
+                            <span class="badge bg-danger">High</span>
+                            {% elif assessment.security_categorization == 'Moderate' %}
+                            <span class="badge bg-warning">Moderate</span>
+                            {% elif assessment.security_categorization == 'Low' %}
+                            <span class="badge bg-success">Low</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if assessment.assets %}
+                            {{ assessment.assets[0].name }}
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if assessment.entries %}
+                            {% set risk_level = assessment.entries[0].risk_level %}
+                            {% if risk_level >= 4 %}
+                            <span class="badge bg-danger">High ({{ risk_level }})</span>
+                            {% elif risk_level == 3 %}
+                            <span class="badge bg-warning">Moderate ({{ risk_level }})</span>
+                            {% else %}
+                            <span class="badge bg-success">Low ({{ risk_level }})</span>
+                            {% endif %}
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div
+                                    style="width: 24px; height: 24px; background-color: var(--primary-light); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600;">
+                                    {{ (assessment.created_by or 'U')[0]|upper }}
+                                </div>
+                                {{ assessment.created_by or 'Unknown' }}
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{{ url_for('view_assessment', assessment_id=assessment.id) }}"
+                                class="btn btn-sm btn-secondary" style="margin-right: 0.5rem;">View</a>
+                            {% if session.get('user_role') == 'Admin' %}
+                            <form action="{{ url_for('delete_assessment', assessment_id=assessment.id) }}" method="POST"
+                                style="display:inline;"
+                                onsubmit="return confirm('Are you sure you want to delete this assessment?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% else %}
+        <div style="text-align: center; padding: 4rem 2rem;">
+            <i class="bi bi-clipboard-data"
+                style="font-size: 3rem; color: var(--border-color); margin-bottom: 1rem; display: block;"></i>
+            <h3 style="color: var(--text-light);">No assessments found</h3>
+            <p class="text-muted" style="margin-bottom: 2rem;">Get started by creating your first risk assessment.</p>
+            <a href="{{ url_for('start_assessment') }}" class="btn btn-primary">Start New Assessment</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

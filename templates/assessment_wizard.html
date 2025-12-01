@@ -229,227 +229,358 @@
                     <input type="radio" name="targeting" value="Moderate">
                     <span class="card-content"><span class="level">Moderate</span></span>
                 </label>
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="High">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="targeting" value="Very High">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
+                {% extends "base.html" %}
 
-        {% elif step == 7 %}
-        <div class="step-content">
-            <h2>Step 7: Likelihood of Initiation</h2>
-            <p class="step-desc">Based on Capability, Intent, and Targeting, how likely is the threat to be
-                initiated?
-            </p>
+                {% block content %}
+                <div class="wizard-container fade-in">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ (step / 11) * 100 }}%;"></div>
+                            </div>
 
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-6')">Expand Options /
-                Guidance</button>
-            <div id="guidance-6" class="guidance-content hidden">
-                <h4>Likelihood of Initiation</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Adversary is unlikely to initiate.</li>
-                    <li><strong>Low:</strong> Adversary may initiate.</li>
-                    <li><strong>Moderate:</strong> Adversary is likely to initiate.</li>
-                    <li><strong>High:</strong> Adversary is highly likely to initiate.</li>
-                    <li><strong>Very High:</strong> Adversary will almost certainly initiate.</li>
-                </ul>
-            </div>
+                            <form method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="1" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="2">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="3">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="4">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_initiation" value="5">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
+                                {% if step == 1 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 1: Asset Identification</h2>
+                                    <p class="text-muted">Identify and value the primary asset being assessed.</p>
 
-        {% elif step == 8 %}
-        <div class="step-content">
-            <h2>Step 8: Vulnerability & Likelihood of Impact</h2>
-            <p class="step-desc">What vulnerability is being exploited, and how likely is it to succeed?</p>
+                                    <div class="form-group text-start">
+                                        <label for="asset_name">Asset Name</label>
+                                        <input type="text" class="form-control" id="asset_name" name="asset_name"
+                                            required
+                                            value="{{ session.get('assessment_data', {}).get('asset_name', '') }}"
+                                            placeholder="e.g., Customer Database, Payment Gateway">
+                                    </div>
 
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-7')">Expand Options /
-                Guidance</button>
-            <div id="guidance-7" class="guidance-content hidden">
-                <h4>Vulnerability & Impact Likelihood</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Vulnerability is theoretical; high defense.</li>
-                    <li><strong>Low:</strong> Difficult to exploit; moderate defense.</li>
-                    <li><strong>Moderate:</strong> Feasible to exploit; limited defense.</li>
-                    <li><strong>High:</strong> Easy to exploit; weak defense.</li>
-                    <li><strong>Very High:</strong> Trivial to exploit; no defense.</li>
-                </ul>
-            </div>
+                                    <div class="form-group text-start">
+                                        <label for="asset_type">Asset Type</label>
+                                        <select class="form-control" id="asset_type" name="asset_type" required>
+                                            <option value="">Select Type...</option>
+                                            <option value="Hardware" {% if session.get('assessment_data',
+                                                {}).get('asset_type')=='Hardware' %}selected{% endif %}>Hardware
+                                            </option>
+                                            <option value="Software" {% if session.get('assessment_data',
+                                                {}).get('asset_type')=='Software' %}selected{% endif %}>Software
+                                            </option>
+                                            <option value="Data" {% if session.get('assessment_data',
+                                                {}).get('asset_type')=='Data' %}selected{% endif %}>Data</option>
+                                            <option value="People" {% if session.get('assessment_data',
+                                                {}).get('asset_type')=='People' %}selected{% endif %}>People</option>
+                                            <option value="Process" {% if session.get('assessment_data',
+                                                {}).get('asset_type')=='Process' %}selected{% endif %}>Process</option>
+                                        </select>
+                                    </div>
 
-            <div class="form-group">
-                <label for="vulnerability">Vulnerability Description</label>
-                <input type="text" id="vulnerability" name="vulnerability" required
-                    placeholder="e.g. Unpatched Server, Weak Password">
-            </div>
+                                    <div class="form-group text-start">
+                                        <label for="asset_valuation">Asset Valuation ($)</label>
+                                        <input type="number" class="form-control" id="asset_valuation"
+                                            name="asset_valuation" required
+                                            value="{{ session.get('assessment_data', {}).get('asset_valuation', '') }}"
+                                            placeholder="Estimated value in USD">
+                                    </div>
+                                </div>
 
-            <div class="form-group">
-                <label for="vulnerability_report">Upload Vulnerability Report (Optional)</label>
-                <input type="file" id="vulnerability_report" name="vulnerability_report" accept=".xml,.json,.csv"
-                    class="form-control">
-                <small class="form-text text-muted">Supported formats: Nmap XML, Nessus CSV, Generic JSON.</small>
-            </div>
+                                {% elif step == 2 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 2: Threat Source Identification</h2>
+                                    <p class="text-muted">Identify the potential source of the threat.</p>
 
-            <label>Likelihood of Adverse Impact (Success)</label>
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="1" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="2">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="3">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="4">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="likelihood_impact" value="5">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
+                                    <div class="form-group text-start">
+                                        <label for="threat_source">Threat Source</label>
+                                        <select class="form-control" id="threat_source" name="threat_source" required>
+                                            <option value="">Select Source...</option>
+                                            <option value="Adversarial - Hacker" {% if session.get('assessment_data',
+                                                {}).get('threat_source')=='Adversarial - Hacker' %}selected{% endif %}>
+                                                Adversarial - Hacker</option>
+                                            <option value="Adversarial - Insider" {% if session.get('assessment_data',
+                                                {}).get('threat_source')=='Adversarial - Insider' %}selected{% endif %}>
+                                                Adversarial - Insider</option>
+                                            <option value="Adversarial - Nation State" {% if
+                                                session.get('assessment_data',
+                                                {}).get('threat_source')=='Adversarial - Nation State' %}selected{%
+                                                endif %}>Adversarial - Nation State</option>
+                                            <option value="Adversarial - Vendor/Supplier" {% if
+                                                session.get('assessment_data',
+                                                {}).get('threat_source')=='Adversarial - Vendor/Supplier' %}selected{%
+                                                endif %}>Adversarial - Vendor/Supplier</option>
+                                            <option value="Accidental - User Error" {% if session.get('assessment_data',
+                                                {}).get('threat_source')=='Accidental - User Error' %}selected{% endif
+                                                %}>Accidental - User Error</option>
+                                            <option value="Environmental - Natural Disaster" {% if
+                                                session.get('assessment_data',
+                                                {}).get('threat_source')=='Environmental - Natural Disaster'
+                                                %}selected{% endif %}>Environmental - Natural Disaster</option>
+                                            <option value="Structural - Equipment Failure" {% if
+                                                session.get('assessment_data',
+                                                {}).get('threat_source')=='Structural - Equipment Failure' %}selected{%
+                                                endif %}>Structural - Equipment Failure</option>
+                                        </select>
+                                        <small class="text-muted">Note: Selecting 'Vendor/Supplier' will trigger Supply
+                                            Chain Risk Management (SCRM) considerations.</small>
+                                    </div>
+                                </div>
 
-        {% elif step == 9 %}
-        <div class="step-content">
-            <h2>Step 9: Impact Level</h2>
-            <p class="step-desc">What would be the impact if the threat event occurs?</p>
+                                {% elif step == 3 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 3: Threat Event</h2>
+                                    <p class="text-muted">Describe the specific threat event.</p>
 
-            <button type="button" class="btn-expand" onclick="toggleGuidance('guidance-8')">Expand Options /
-                Guidance</button>
-            <div id="guidance-8" class="guidance-content hidden">
-                <h4>Impact Levels</h4>
-                <ul>
-                    <li><strong>Very Low:</strong> Negligible effect.</li>
-                    <li><strong>Low:</strong> Minor effect; limited damage.</li>
-                    <li><strong>Moderate:</strong> Serious effect; significant damage.</li>
-                    <li><strong>High:</strong> Severe effect; major damage.</li>
-                    <li><strong>Very High:</strong> Catastrophic effect; critical failure.</li>
-                </ul>
-            </div>
+                                    {% if suggested_threats %}
+                                    <div class="alert alert-info text-start">
+                                        <strong><i class="bi bi-lightbulb"></i> Suggested Threats for {{
+                                            session.get('assessment_data', {}).get('asset_type') }}:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            {% for threat in suggested_threats %}
+                                            <li>{{ threat }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
 
-            <div class="radio-group">
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="1" required>
-                    <span class="card-content"><span class="level">Very Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="2">
-                    <span class="card-content"><span class="level">Low</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="3">
-                    <span class="card-content"><span class="level">Moderate</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="4">
-                    <span class="card-content"><span class="level">High</span></span>
-                </label>
-                <label class="radio-card">
-                    <input type="radio" name="impact_level" value="5">
-                    <span class="card-content"><span class="level">Very High</span></span>
-                </label>
-            </div>
-        </div>
+                                    <div class="form-group text-start">
+                                        <label for="threat_event">Threat Event Description</label>
+                                        <textarea class="form-control" id="threat_event" name="threat_event" rows="4"
+                                            required
+                                            placeholder="Describe what the threat source might do...">{{ session.get('assessment_data', {}).get('threat_event', '') }}</textarea>
+                                    </div>
+                                </div>
 
-        {% elif step == 10 %}
-        <div class="step-content">
-            <h2>Step 10: Financial Impact (CRQ)</h2>
-            <p class="step-desc">Estimate the potential financial loss (Cyber Risk Quantification).</p>
+                                {% elif step == 4 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 4: Threat Capability</h2>
+                                    <p class="text-muted">Assess the capability of the threat source.</p>
 
-            <div class="form-group">
-                <label for="financial_impact">Estimated Financial Impact ($)</label>
-                <input type="number" id="financial_impact" name="financial_impact" step="1000" placeholder="e.g. 50000">
-            </div>
-        </div>
+                                    <div class="form-group text-start">
+                                        <label>Capability Level</label>
+                                        <div class="radio-group">
+                                            {% for level in ['Very Low', 'Low', 'Moderate', 'High', 'Very High'] %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="capability"
+                                                    id="cap_{{ loop.index }}" value="{{ level }}" required {% if
+                                                    session.get('assessment_data', {}).get('capability')==level
+                                                    %}checked{% endif %}>
+                                                <label class="form-check-label" for="cap_{{ loop.index }}">
+                                                    {{ level }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
 
-        {% elif step == 11 %}
-        <div class="step-content">
-            <h2>Step 11: Business Impact Analysis (BIA)</h2>
-            <p class="step-desc">Assess the impact on business operations and reputation.</p>
+                                {% elif step == 5 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 5: Threat Intent</h2>
+                                    <p class="text-muted">Assess the intent of the threat source (Adversarial only).</p>
 
-            <div class="form-group">
-                <label for="bia_reputation">Reputational Damage</label>
-                <select id="bia_reputation" name="bia_reputation">
-                    <option value="None">None</option>
-                    <option value="Low">Low (Internal only)</option>
-                    <option value="Moderate">Moderate (Local media)</option>
-                    <option value="High">High (National media)</option>
-                    <option value="Critical">Critical (Global brand damage)</option>
-                </select>
-            </div>
+                                    <div class="form-group text-start">
+                                        <label>Intent Level</label>
+                                        <div class="radio-group">
+                                            {% for level in ['Very Low', 'Low', 'Moderate', 'High', 'Very High'] %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="intent"
+                                                    id="int_{{ loop.index }}" value="{{ level }}" required {% if
+                                                    session.get('assessment_data', {}).get('intent')==level %}checked{%
+                                                    endif %}>
+                                                <label class="form-check-label" for="int_{{ loop.index }}">
+                                                    {{ level }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
 
-            <div class="form-group">
-                <label for="bia_legal">Legal & Regulatory Impact</label>
-                <select id="bia_legal" name="bia_legal">
-                    <option value="None">None</option>
-                    <option value="Low">Low (Minor fines)</option>
-                    <option value="Moderate">Moderate (Significant fines)</option>
-                    <option value="High">High (Major lawsuits/Sanctions)</option>
-                </select>
-            </div>
+                                {% elif step == 6 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 6: Targeting</h2>
+                                    <p class="text-muted">Assess the likelihood of being targeted.</p>
 
-            <div class="form-group">
-                <label for="bia_operational">Operational Downtime</label>
-                <select id="bia_operational" name="bia_operational">
-                    <option value="None">None</option>
-                    <option value="< 1 hour">&lt; 1 hour</option>
-                    <option value="1-24 hours">1-24 hours</option>
-                    <option value="1-7 days">1-7 days</option>
-                    <option value="> 1 week">&gt; 1 week</option>
-                </select>
-            </div>
+                                    <div class="form-group text-start">
+                                        <label>Targeting Level</label>
+                                        <div class="radio-group">
+                                            {% for level in ['Very Low', 'Low', 'Moderate', 'High', 'Very High'] %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="targeting"
+                                                    id="tgt_{{ loop.index }}" value="{{ level }}" required {% if
+                                                    session.get('assessment_data', {}).get('targeting')==level
+                                                    %}checked{% endif %}>
+                                                <label class="form-check-label" for="tgt_{{ loop.index }}">
+                                                    {{ level }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
 
-            <div class="form-group">
-                <label for="bia_safety">Safety Impact</label>
-                <select id="bia_safety" name="bia_safety">
-                    <option value="None">None</option>
-                    <option value="Low">Low (Minor injury)</option>
-                    <option value="Moderate">Moderate (Major injury)</option>
-                    <option value="High">High (Loss of life)</option>
-                </select>
-            </div>
-        </div>
-        {% endif %}
+                                {% elif step == 7 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 7: Vulnerability Identification</h2>
+                                    <p class="text-muted">Identify vulnerabilities that could be exploited.</p>
 
-        <div class="wizard-actions">
-            {% if step > 1 %}
-            <a href="{{ url_for('assessment_step', step_id=step-1) }}" class="btn-secondary">Previous</a>
-            {% endif %}
-            <button type="submit" class="btn-primary">
-                {% if step == 11 %}Finish Assessment{% else %}Next Step{% endif %}
-            </button>
-        </div>
-    </form>
-</div>
-{% endblock %}
+                                    <div class="form-group text-start">
+                                        <label for="vulnerability">Vulnerability Description</label>
+                                        <textarea class="form-control" id="vulnerability" name="vulnerability" rows="4"
+                                            required
+                                            placeholder="Describe the weakness or flaw...">{{ session.get('assessment_data', {}).get('vulnerability', '') }}</textarea>
+                                    </div>
+                                </div>
+
+                                {% elif step == 8 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 8: Automated Ingestion</h2>
+                                    <p class="text-muted">Upload a vulnerability report (optional).</p>
+
+                                    <div class="form-group text-start">
+                                        <label for="vulnerability_report">Upload Report (JSON/XML/CSV)</label>
+                                        <input type="file" class="form-control" id="vulnerability_report"
+                                            name="vulnerability_report">
+                                        <small class="text-muted">Supported formats: Nessus, OpenVAS, Generic
+                                            CSV.</small>
+                                    </div>
+
+                                    <div class="alert alert-secondary mt-3">
+                                        <i class="bi bi-info-circle"></i> Skipping this step will proceed with manual
+                                        entry.
+                                    </div>
+                                </div>
+
+                                {% elif step == 9 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 9: Likelihood Determination</h2>
+                                    <p class="text-muted">Determine the likelihood of initiation and impact.</p>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group text-start">
+                                                <label>Likelihood of Initiation</label>
+                                                <select class="form-control" name="likelihood_initiation" required>
+                                                    {% for i in range(1, 6) %}
+                                                    <option value="{{ i }}" {% if session.get('assessment_data',
+                                                        {}).get('likelihood_initiation')|int==i %}selected{% endif %}>{{
+                                                        i }} - {{ ['Very Low', 'Low', 'Moderate', 'High', 'Very
+                                                        High'][i-1] }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group text-start">
+                                                <label>Likelihood of Impact</label>
+                                                <select class="form-control" name="likelihood_impact" required>
+                                                    {% for i in range(1, 6) %}
+                                                    <option value="{{ i }}" {% if session.get('assessment_data',
+                                                        {}).get('likelihood_impact')|int==i %}selected{% endif %}>{{ i
+                                                        }} - {{ ['Very Low', 'Low', 'Moderate', 'High', 'Very
+                                                        High'][i-1] }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% elif step == 10 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 10: Impact Analysis</h2>
+                                    <p class="text-muted">Assess the potential impact of the threat event.</p>
+
+                                    <div class="form-group text-start">
+                                        <label>Impact Level</label>
+                                        <select class="form-control" name="impact_level" required>
+                                            {% for i in range(1, 6) %}
+                                            <option value="{{ i }}" {% if session.get('assessment_data',
+                                                {}).get('impact_level')|int==i %}selected{% endif %}>{{ i }} - {{ ['Very
+                                                Low', 'Low', 'Moderate', 'High', 'Very High'][i-1] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group text-start">
+                                        <label for="financial_impact">Estimated Financial Impact ($)</label>
+                                        <input type="number" class="form-control" id="financial_impact"
+                                            name="financial_impact" required
+                                            value="{{ session.get('assessment_data', {}).get('financial_impact', '') }}">
+                                    </div>
+                                </div>
+
+                                {% elif step == 11 %}
+                                <div class="step-content text-center">
+                                    <h2>Step 11: Business Impact Analysis (BIA)</h2>
+                                    <p class="text-muted">Assess the broader business consequences.</p>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group text-start">
+                                                <label>Reputation Damage</label>
+                                                <select class="form-control" name="bia_reputation" required>
+                                                    {% for level in ['None', 'Low', 'Moderate', 'High', 'Critical'] %}
+                                                    <option value="{{ level }}" {% if session.get('assessment_data',
+                                                        {}).get('bia_reputation')==level %}selected{% endif %}>{{ level
+                                                        }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group text-start">
+                                                <label>Legal/Regulatory Fines</label>
+                                                <select class="form-control" name="bia_legal" required>
+                                                    {% for level in ['None', 'Low', 'Moderate', 'High', 'Critical'] %}
+                                                    <option value="{{ level }}" {% if session.get('assessment_data',
+                                                        {}).get('bia_legal')==level %}selected{% endif %}>{{ level }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group text-start">
+                                                <label>Operational Disruption</label>
+                                                <select class="form-control" name="bia_operational" required>
+                                                    {% for level in ['None', 'Low', 'Moderate', 'High', 'Critical'] %}
+                                                    <option value="{{ level }}" {% if session.get('assessment_data',
+                                                        {}).get('bia_operational')==level %}selected{% endif %}>{{ level
+                                                        }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group text-start">
+                                                <label>Safety/Health Impact</label>
+                                                <select class="form-control" name="bia_safety" required>
+                                                    {% for level in ['None', 'Low', 'Moderate', 'High', 'Critical'] %}
+                                                    <option value="{{ level }}" {% if session.get('assessment_data',
+                                                        {}).get('bia_safety')==level %}selected{% endif %}>{{ level }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div class="mt-4 d-flex justify-content-between">
+                                    {% if step > 1 %}
+                                    <a href="{{ url_for('assessment_step', step_id=step-1) }}"
+                                        class="btn btn-secondary">Previous</a>
+                                    {% else %}
+                                    <a href="{{ url_for('assessment_scope') }}" class="btn btn-secondary">Back to
+                                        Scope</a>
+                                    {% endif %}
+
+                                    <button type="submit" class="btn btn-primary">
+                                        {% if step == 11 %}Finish Assessment{% else %}Next Step{% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endblock %}

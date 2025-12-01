@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from models import db, Assessment, RiskEntry, Asset
+from chat_logic import ChatSession
 import os
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
@@ -112,8 +113,8 @@ def about():
 @login_required
 @role_required(['Analyst', 'Admin'])
 def start_assessment():
-    # Redirect to Scoping first (Suggestion 10)
-    return redirect(url_for('assessment_scope'))
+    # Render selection page instead of redirecting
+    return render_template('assessment_selection.html')
 
 @app.route('/assessment/scope', methods=['GET', 'POST'])
 @login_required
@@ -207,6 +208,12 @@ def dashboard():
     assessments = Assessment.query.order_by(Assessment.date_created.desc()).all()
     return render_template('dashboard.html', assessments=assessments)
 
+@app.route('/assessment/view/<int:assessment_id>')
+@login_required
+def view_assessment(assessment_id):
+    assessment = Assessment.query.get_or_404(assessment_id)
+    return render_template('view_assessment.html', assessment=assessment)
+
 @app.route('/assessment/save', methods=['POST'])
 @login_required
 @role_required(['Analyst', 'Admin'])
@@ -215,13 +222,22 @@ def save_assessment():
     if not data:
         return redirect(url_for('index'))
     
+    persist_assessment(data, session.get('username'))
+    
+    # Clear Assessment Data from Session
+    session.pop('assessment_data', None)
+    session.pop('step', None)
+    
+    return redirect(url_for('dashboard'))
+
+def persist_assessment(data, username):
     # Create Assessment
     assessment = Assessment(
         status='Completed',
         title=data.get('title', 'Untitled Assessment'),
         security_categorization=data.get('security_categorization'),
         description=data.get('description'),
-        created_by=session.get('username')
+        created_by=username
     )
     # Explicitly set title to ensure it's not overwritten by default
     if data.get('title'):
@@ -267,11 +283,62 @@ def save_assessment():
     )
     db.session.add(risk_entry)
     db.session.commit()
+
+@app.route('/assessment/chat')
+@login_required
+@role_required(['Analyst', 'Admin'])
+def assessment_chat():
+    # Initialize chat session if needed
+    if 'chat_session' not in session:
+        session['chat_session'] = {}
+    return render_template('chat_assessment.html')
+
+@app.route('/assessment/chat/history')
+@login_required
+def chat_history():
+    cs = ChatSession(session.get('chat_session'))
+    return {'history': cs.history}
+
+@app.route('/assessment/chat/message', methods=['POST'])
+@login_required
+def chat_message():
+    data = request.get_json()
+    user_text = data.get('message')
     
-    # Clear Assessment Data from Session
+    cs = ChatSession(session.get('chat_session'))
+    
+    # Special start command
+    if user_text == 'START_SESSION' and not cs.history:
+        response_text, options = cs.generate_response() # Initial greeting
+        cs.add_message('bot', response_text, options)
+    else:
+        # Normal processing
+        response_text, options = cs.handle_input(user_text)
+        cs.add_message('bot', response_text, options)
+    
+    session['chat_session'] = cs.to_dict()
+    
+    if cs.step == 'COMPLETED':
+        # Transfer data to assessment_data for saving
+        session['assessment_data'] = cs.data
+        return {'text': response_text, 'options': options, 'redirect': url_for('save_chat_assessment')}
+        
+    return {'text': response_text, 'options': options}
+
+@app.route('/assessment/chat/save')
+@login_required
+def save_chat_assessment():
+    data = session.get('assessment_data')
+    if not data:
+        return redirect(url_for('index'))
+        
+    persist_assessment(data, session.get('username'))
+    
+    # Clear sessions
     session.pop('assessment_data', None)
-    session.pop('step', None)
+    session.pop('chat_session', None)
     
+    flash('Assessment completed via Chat!', 'success')
     return redirect(url_for('dashboard'))
 
 @app.route('/assessment/delete/<int:assessment_id>', methods=['POST'])

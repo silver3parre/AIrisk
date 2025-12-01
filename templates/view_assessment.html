@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4 fade-in">
+    <div class="col-md-12" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin-bottom: 0.5rem;">{{ assessment.title }}</h2>
+            <p class="text-muted" style="margin-bottom: 0;">{{ assessment.description }}</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left" style="margin-right: 0.5rem;"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body"
+                style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div>
+                    <div
+                        style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem;">
+                        Security Categorization</div>
+                    <div style="font-size: 1.1rem; font-weight: 600;">
+                        {% if assessment.security_categorization == 'High' %}
+                        <span class="badge bg-danger">High</span>
+                        {% elif assessment.security_categorization == 'Moderate' %}
+                        <span class="badge bg-warning">Moderate</span>
+                        {% elif assessment.security_categorization == 'Low' %}
+                        <span class="badge bg-success">Low</span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div
+                        style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem;">
+                        Created By</div>
+                    <div style="font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="bi bi-person-circle" style="color: var(--primary-color);"></i> {{
+                        assessment.created_by }}
+                    </div>
+                </div>
+                <div>
+                    <div
+                        style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem;">
+                        Date Created</div>
+                    <div style="font-size: 1.1rem; font-weight: 600;">{{ assessment.date_created.strftime('%Y-%m-%d') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if assessment.entries %}
+{% set entry = assessment.entries[0] %}
+<div class="row fade-in" style="animation-delay: 0.2s;">
+    <div class="col-md-12 mb-4">
+        <div class="card"
+            style="border-left: 4px solid {% if entry.risk_level >= 4 %}var(--danger-color){% elif entry.risk_level == 3 %}var(--warning-color){% else %}var(--success-color){% endif %};">
+            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin-bottom: 0.5rem;">Overall Risk Level</h3>
+                    <p class="text-muted" style="margin-bottom: 0;">Calculated based on likelihood and impact.</p>
+                </div>
+                <div style="text-align: right;">
+                    <div
+                        style="font-size: 3rem; font-weight: 800; line-height: 1; color: {% if entry.risk_level >= 4 %}var(--danger-color){% elif entry.risk_level == 3 %}var(--warning-color){% else %}var(--success-color){% endif %};">
+                        {{ entry.risk_level }}
+                    </div>
+                    <div
+                        style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light);">
+                        {% if entry.risk_level >= 4 %}Very High{% elif entry.risk_level == 3 %}Moderate{% else %}Low{%
+                        endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row fade-in" style="animation-delay: 0.3s;">
+    <div class="col-md-6 mb-4">
+        <div class="card" style="height: 100%;">
+            <div class="card-header">
+                <i class="bi bi-box-seam" style="color: var(--primary-color);"></i> Asset Profile
+            </div>
+            <div class="card-body">
+                {% if assessment.assets %}
+                {% set asset = assessment.assets[0] %}
+                <div class="form-group">
+                    <label>Asset Name</label>
+                    <div class="form-control" style="background-color: var(--background-color); border: none;">{{
+                        asset.name }}</div>
+                </div>
+                <div class="form-group">
+                    <label>Asset Type</label>
+                    <div class="form-control" style="background-color: var(--background-color); border: none;">{{
+                        asset.asset_type }}</div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Valuation</label>
+                    <div class="form-control" style="background-color: var(--background-color); border: none;">${{
+                        asset.valuation }}</div>
+                </div>
+                {% else %}
+                <p class="text-muted">No asset information available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card" style="height: 100%;">
+            <div class="card-header">
+                <i class="bi bi-shield-exclamation" style="color: var(--primary-color);"></i> Threat Profile
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Threat Event</label>
+                    <div class="form-control" style="background-color: var(--background-color); border: none;">{{
+                        entry.threat_event }}</div>
+                </div>
+                <div class="form-group">
+                    <label>Threat Source</label>
+                    <div class="form-control" style="background-color: var(--background-color); border: none;">{{
+                        entry.threat_source }}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Capability</label>
+                        <div class="form-control" style="background-color: var(--background-color); border: none;">{{
+                            entry.capability }}</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Intent</label>
+                        <div class="form-control" style="background-color: var(--background-color); border: none;">{{
+                            entry.intent }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row fade-in" style="animation-delay: 0.4s;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clipboard-data" style="color: var(--primary-color);"></i> Analysis Details
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                    <div>
+                        <label
+                            style="font-size: 0.85rem; color: var(--text-light); font-weight: 600;">Vulnerability</label>
+                        <p style="font-weight: 500;">{{ entry.vulnerability }}</p>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-light); font-weight: 600;">Likelihood
+                            (Init)</label>
+                        <p style="font-weight: 500;">{{ entry.likelihood_initiation }}</p>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-light); font-weight: 600;">Likelihood
+                            (Impact)</label>
+                        <p style="font-weight: 500;">{{ entry.likelihood_impact }}</p>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-light); font-weight: 600;">Overall
+                            Likelihood</label>
+                        <p style="font-weight: 500;">{{ entry.overall_likelihood }}</p>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-light); font-weight: 600;">Impact
+                            Level</label>
+                        <p style="font-weight: 500;">{{ entry.impact_level }}</p>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-light); font-weight: 600;">Financial
+                            Impact</label>
+                        <p style="font-weight: 500;">${{ entry.financial_impact }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning fade-in">No risk analysis data found for this assessment.</div>
+{% endif %}
+{% endblock %}
