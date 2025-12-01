@@ -43,6 +43,9 @@ def assessment_step(step_id):
         for key, value in data.items():
             current_data[key] = value
             
+        for key, value in data.items():
+            current_data[key] = value
+            
         if 'vulnerability_report' in request.files:
             file = request.files['vulnerability_report']
             if file and file.filename != '':

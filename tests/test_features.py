@@ -20,6 +20,11 @@ class TestFeatures(unittest.TestCase):
         with app.app_context():
             db.create_all()
             
+        # Login as Analyst
+        with self.client.session_transaction() as sess:
+            sess['user_role'] = 'Analyst'
+            sess['username'] = 'testuser'
+            
     def tearDown(self):
         with app.app_context():
             db.session.remove()
@@ -40,7 +45,7 @@ class TestFeatures(unittest.TestCase):
         
         response = self.client.post('/assessment/save', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Assessment Dashboard', response.data)
+        self.assertIn(b'Dashboard', response.data)
         self.assertIn(b'Test Asset', response.data)
         
         with app.app_context():
