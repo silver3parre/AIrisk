@@ -60,10 +60,33 @@
 {% set risk_color = 'var(--success-color)' %}
 {% if entry.risk_level >= 4 %}
 {% set risk_color = 'var(--danger-color)' %}
-</div>
-</div>
-</div>
-</div>
+{% elif entry.risk_level == 3 %}
+{% set risk_color = 'var(--warning-color)' %}
+{% endif %}
+
+<div class="row fade-in" style="animation-delay: 0.2s;">
+    <div class="col-md-12 mb-4">
+        <div class="card"
+            style="--card-border-color: {{ risk_color }}; border-left: 4px solid var(--card-border-color);">
+            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin-bottom: 0.5rem;">Overall Risk Level</h3>
+                    <p class="text-muted" style="margin-bottom: 0;">Calculated based on likelihood and impact.</p>
+                </div>
+                <div style="text-align: right;">
+                    <div
+                        style="--risk-text-color: {{ risk_color }}; font-size: 3rem; font-weight: 800; line-height: 1; color: var(--risk-text-color);">
+                        {{ entry.risk_level }}
+                    </div>
+                    <div
+                        style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light);">
+                        {% if entry.risk_level >= 4 %}Very High{% elif entry.risk_level == 3 %}Moderate{% else %}Low{%
+                        endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row fade-in" style="animation-delay: 0.3s;">
