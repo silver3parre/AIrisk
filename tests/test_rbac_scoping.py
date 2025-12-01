@@ -103,9 +103,9 @@ class RBACScopingTestCase(unittest.TestCase):
     def test_analyst_scoping_flow(self):
         self.login('analyst', 'Analyst')
         
-        # 1. Start Assessment -> Redirects to Scope
+        # 1. Start Assessment -> Redirects to Selection Page
         rv = self.client.get('/assessment/start', follow_redirects=True)
-        self.assertIn(b'Pre-Assessment Scoping', rv.data)
+        self.assertIn(b'Choose Your Path', rv.data)
         
         # 2. Submit Scope
         rv = self.client.post('/assessment/scope', data=dict(
@@ -115,7 +115,7 @@ class RBACScopingTestCase(unittest.TestCase):
         ), follow_redirects=True)
         
         # Should redirect to Step 1
-        self.assertIn(b'Step 1: Identify Asset', rv.data)
+        self.assertIn(b'Step 1: Asset Identification', rv.data)
         
         # 3. Verify Session Data (via saving)
         # Fast forward to save (skipping steps for test speed, assuming session holds scope)

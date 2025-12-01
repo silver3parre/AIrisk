@@ -19,9 +19,19 @@ class TestIntegration(unittest.TestCase):
 
     def test_full_assessment_flow(self):
         """Test the complete assessment wizard flow."""
-        # 1. Start Assessment
-        response = self.app.get('/assessment/start', follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
+        # 0. Login
+        self.app.post('/login', data={'username': 'testuser', 'role': 'Analyst'}, follow_redirects=True)
+
+        # 1. Start Assessment -> Selection -> Scope
+        self.app.get('/assessment/start', follow_redirects=True)
+        
+        # 2. Submit Scope (New Step)
+        response = self.app.post('/assessment/scope', data={
+            'assessment_title': 'Integration Test',
+            'security_categorization': 'High',
+            'system_description': 'Test System'
+        }, follow_redirects=True)
+        
         self.assertIn(b'Step 1', response.data)
 
         # 2. Submit Step 1 (Asset Identification) [NEW]

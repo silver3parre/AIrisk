@@ -32,9 +32,8 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application files
-COPY app.py models.py risk_logic.py ./
-COPY static ./static
-COPY templates ./templates
+# Copy application files
+COPY . .
 
 # Create instance directory for SQLite database
 RUN mkdir -p instance
