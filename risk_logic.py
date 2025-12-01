@@ -108,3 +108,58 @@ def calculate_risk_details(data):
             'risk_score': 0
         }
 
+
+def persist_assessment(data, username):
+    from models import db, Assessment, Asset, RiskEntry
+    
+    # Create Assessment
+    assessment = Assessment(
+        status='Completed',
+        title=data.get('title', 'Untitled Assessment'),
+        security_categorization=data.get('security_categorization'),
+        description=data.get('description'),
+        created_by=username
+    )
+    # Explicitly set title to ensure it's not overwritten by default
+    if data.get('title'):
+        assessment.title = data.get('title')
+        
+    db.session.add(assessment)
+    db.session.flush() # Get ID
+    
+    # Create Asset
+    asset = Asset(
+        assessment_id=assessment.id,
+        name=data.get('asset_name', 'Unknown Asset'),
+        asset_type=data.get('asset_type'),
+        valuation=data.get('asset_valuation')
+    )
+    db.session.add(asset)
+    
+    # Create Risk Entry
+    
+    l_init = int(data.get('likelihood_initiation', 1))
+    l_impact = int(data.get('likelihood_impact', 1))
+    impact = int(data.get('impact_level', 1))
+    
+    overall_likelihood = calculate_overall_likelihood(l_init, l_impact)
+    risk_score = calculate_risk(overall_likelihood, impact)
+    
+    risk_entry = RiskEntry(
+        assessment_id=assessment.id,
+        asset_id=asset.id, # Will be linked after flush/commit
+        threat_source=data.get('threat_source'),
+        threat_event=data.get('threat_event'),
+        capability=data.get('capability'),
+        intent=data.get('intent'),
+        targeting=data.get('targeting'),
+        vulnerability=data.get('vulnerability'),
+        likelihood_initiation=l_init,
+        likelihood_impact=l_impact,
+        overall_likelihood=overall_likelihood,
+        impact_level=impact,
+        financial_impact=data.get('financial_impact'),
+        risk_level=risk_score
+    )
+    db.session.add(risk_entry)
+    db.session.commit()

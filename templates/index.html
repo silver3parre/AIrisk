@@ -1,7 +1,36 @@
-</div>
-<div class="feature-card">
-    <h3>Role-Based Collaboration</h3>
-    <p>Secure access for Analysts, Viewers, and Admins with tailored permissions.</p>
-</div>
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <h1>Risk Assessment Made Simple</h1>
+    <p>Conduct NIST SP 800-30 compliant risk assessments with ease. Guided wizards, automated reporting, and intelligent
+        insights.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{{ url_for('assessment.start_assessment') }}" class="btn btn-primary">Start Assessment</a>
+        <a href="{{ url_for('main.about') }}" class="btn btn-secondary">Learn More</a>
+    </div>
+</section>
+
+<section class="features"
+    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; padding: 4rem 0;">
+    <div class="card">
+        <div class="card-body">
+            <h3><i class="bi bi-magic" style="color: var(--primary-color);"></i> Guided Wizard</h3>
+            <p>Step-by-step process to identify threats, vulnerabilities, and impacts without getting lost in
+                spreadsheets.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h3><i class="bi bi-chat-dots" style="color: var(--primary-color);"></i> AI Assistant</h3>
+            <p>Chat with our intelligent assistant to conduct assessments conversationally.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h3><i class="bi bi-file-earmark-text" style="color: var(--primary-color);"></i> Automated Reporting</h3>
+            <p>Generate professional risk reports instantly. Track your security posture over time.</p>
+        </div>
+    </div>
 </section>
 {% endblock %}

@@ -1,16 +1,8 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="row mb-4 fade-in">
-    <div class="col-md-12" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h2>Assessment Dashboard</h2>
-            <p class="text-muted">Manage and review your risk assessments.</p>
-        </div>
-        <a href="{{ url_for('start_assessment') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg" style="margin-right: 0.5rem;"></i> New Assessment
-        </a>
-    </div>
+</div>
+<a href="{{ url_for('assessment.start_assessment') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg" style="margin-right: 0.5rem;"></i> New Assessment
+</a>
+</div>
 </div>
 
 <div class="card fade-in" style="animation-delay: 0.1s;">
@@ -83,15 +75,15 @@
                             </div>
                         </td>
                         <td style="text-align: right;">
-                            <a href="{{ url_for('view_assessment', assessment_id=assessment.id) }}"
+                            <a href="{{ url_for('assessment.view_assessment', assessment_id=assessment.id) }}"
                                 class="btn btn-sm btn-secondary" style="margin-right: 0.5rem;">View</a>
                             {% if session.get('user_role') == 'Admin' %}
-                            <form action="{{ url_for('delete_assessment', assessment_id=assessment.id) }}" method="POST"
-                                style="display:inline;"
-                                onsubmit="return confirm('Are you sure you want to delete this assessment?');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
+                            <button class="btn btn-sm btn-danger"
+                                hx-post="{{ url_for('assessment.delete_assessment', assessment_id=assessment.id) }}"
+                                hx-confirm="Are you sure you want to delete this assessment?" hx-target="closest tr"
+                                hx-swap="outerHTML swap:0.5s" hx-headers='{"X-CSRFToken": "{{ csrf_token() }}"}'>
+                                Delete
+                            </button>
                             {% endif %}
                         </td>
                     </tr>
@@ -105,7 +97,7 @@
                 style="font-size: 3rem; color: var(--border-color); margin-bottom: 1rem; display: block;"></i>
             <h3 style="color: var(--text-light);">No assessments found</h3>
             <p class="text-muted" style="margin-bottom: 2rem;">Get started by creating your first risk assessment.</p>
-            <a href="{{ url_for('start_assessment') }}" class="btn btn-primary">Start New Assessment</a>
+            <a href="{{ url_for('assessment.start_assessment') }}" class="btn btn-primary">Start New Assessment</a>
         </div>
         {% endif %}
     </div>

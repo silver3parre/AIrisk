@@ -7,7 +7,7 @@
             <h2 style="margin-bottom: 0.5rem;">{{ assessment.title }}</h2>
             <p class="text-muted" style="margin-bottom: 0;">{{ assessment.description }}</p>
         </div>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left" style="margin-right: 0.5rem;"></i> Back to Dashboard
         </a>
     </div>
@@ -57,29 +57,13 @@
 
 {% if assessment.entries %}
 {% set entry = assessment.entries[0] %}
-<div class="row fade-in" style="animation-delay: 0.2s;">
-    <div class="col-md-12 mb-4">
-        <div class="card"
-            style="border-left: 4px solid {% if entry.risk_level >= 4 %}var(--danger-color){% elif entry.risk_level == 3 %}var(--warning-color){% else %}var(--success-color){% endif %};">
-            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="margin-bottom: 0.5rem;">Overall Risk Level</h3>
-                    <p class="text-muted" style="margin-bottom: 0;">Calculated based on likelihood and impact.</p>
-                </div>
-                <div style="text-align: right;">
-                    <div
-                        style="font-size: 3rem; font-weight: 800; line-height: 1; color: {% if entry.risk_level >= 4 %}var(--danger-color){% elif entry.risk_level == 3 %}var(--warning-color){% else %}var(--success-color){% endif %};">
-                        {{ entry.risk_level }}
-                    </div>
-                    <div
-                        style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light);">
-                        {% if entry.risk_level >= 4 %}Very High{% elif entry.risk_level == 3 %}Moderate{% else %}Low{%
-                        endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{% set risk_color = 'var(--success-color)' %}
+{% if entry.risk_level >= 4 %}
+{% set risk_color = 'var(--danger-color)' %}
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="row fade-in" style="animation-delay: 0.3s;">
